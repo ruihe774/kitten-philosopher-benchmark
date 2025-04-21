@@ -1,0 +1,28 @@
+\documentclass[book, a5paper]{jlreq}
+
+\usepackage{luatexja-fontspec}
+
+\ltjdefcharrange{6}{`⸺}
+\ltjenableadjust[priority=true]
+\setmainfont[Scale=1, BoldFont=SourceHanSerifSC-Bold.otf]{SourceHanSerifSC-Regular.otf}
+\setmainjfont[YokoFeatures={JFM=zh_CN/kaiming}, Scale=1, Script=CJK, Language={Chinese Simplified}, BoldFont=SourceHanSerifSC-Bold.otf]{SourceHanSerifSC-Regular.otf}
+\newjfontface{\heiti}[YokoFeatures={JFM=zh_CN/kaiming}, Scale=1, Script=CJK, Language={Chinese Simplified}, BoldFont=SourceHanSansSC-Bold.otf]{SourceHanSansSC-Regular.otf}
+
+\ModifyHeading{chapter}{
+  label_format={},
+  align=center,
+  font={\Large},
+  format={\noindent #2}
+}
+
+\ModifyHeading{section}{
+  label_format={},
+  align=center,
+  font={\large},
+  format={\noindent #2}
+}
+
+\begin{document}
+\setlength{\parindent}{2\zw}%
+\include{ghost.tex}
+\end{document}
