@@ -3,12 +3,15 @@
 \usepackage{luatexja-fontspec}
 \usepackage[hidelinks]{hyperref}
 \usepackage{pdfpages}
+\usepackage[pass]{geometry}
 
 \ltjdefcharrange{6}{`⸺}
 \ltjenableadjust[priority=true]
 \setmainfont[Scale=1, BoldFont=SourceHanSerifSC-Bold.otf]{SourceHanSerifSC-Regular.otf}
 \setmainjfont[YokoFeatures={JFM=zh_CN/kaiming}, Scale=1, Script=CJK, Language={Chinese Simplified}, BoldFont=SourceHanSerifSC-Bold.otf]{SourceHanSerifSC-Regular.otf}
-\newjfontface{\heiti}[YokoFeatures={JFM=zh_CN/kaiming}, Scale=1, Script=CJK, Language={Chinese Simplified}, BoldFont=SourceHanSansSC-Bold.otf]{SourceHanSansSC-Regular.otf}
+\newjfontfamily{\heiti}[YokoFeatures={JFM=zh_CN/kaiming}, Scale=1, Script=CJK, Language={Chinese Simplified}, BoldFont=SourceHanSansSC-Bold.otf]{SourceHanSansSC-Regular.otf}
+\newjfontface{\kaiti}[YokoFeatures={JFM=zh_CN/quanjiao}, Scale=1, Script=CJK]{Fandol Kai}
+\newfontfamily{\handwritten}[Scale=1]{TeX Gyre Chorus}
 
 \ModifyHeading{chapter}{
   label_format={},
@@ -24,11 +27,18 @@
   format={\noindent #2}
 }
 
-\newcommand{\partition}[2]{\chapter{#1}\par\nopagebreak\vspace{-3\zh}\noindent\begin{center}\tiny #2\end{center}\par\pagebreak}
+\newcommand{\partition}[2]{\newgeometry{left=3cm,right=3cm}\thispagestyle{empty}\chapter{#1}\par\nopagebreak\vspace{-3\zh}\noindent\begin{center}\handwritten\footnotesize #2\end{center}\par}
+\newcommand{\partquote}[2]{\vspace{9\zh}{\noindent\kaiti\small #1\par\hfill——#2}\par}
+\newcommand{\finishpartition}{\restoregeometry\pagebreak}
+\renewcommand{\contentsname}{}
 \setcounter{tocdepth}{0}
+
+\title{延迟中的幽灵}
+
 \begin{document}
-\tableofcontents%
-\setlength{\parindent}{2\zw}%
+\frontmatter\maketitle%
+\newgeometry{left=3cm,right=3cm}\tableofcontents\thispagestyle{empty}\restoregeometry%
+\mainmatter\setlength{\parindent}{2\zw}%
 \include{ghost.tex}\par
 \include{alice.tex}\par
 \end{document}
