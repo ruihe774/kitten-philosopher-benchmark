@@ -1,7 +1,8 @@
 \documentclass[book, a5paper]{jlreq}
 
 \usepackage{luatexja-fontspec}
-\usepackage{bookmark}
+\usepackage[hidelinks]{hyperref}
+\usepackage{pdfpages}
 
 \ltjdefcharrange{6}{`⸺}
 \ltjenableadjust[priority=true]
@@ -23,7 +24,11 @@
   format={\noindent #2}
 }
 
+\newcommand{\partition}[2]{\chapter{#1}\par\nopagebreak\vspace{-3\zh}\noindent\begin{center}\tiny #2\end{center}\par\pagebreak}
+\setcounter{tocdepth}{0}
 \begin{document}
+\tableofcontents%
 \setlength{\parindent}{2\zw}%
-\include{ghost.tex}
+\include{ghost.tex}\par
+\include{alice.tex}\par
 \end{document}
