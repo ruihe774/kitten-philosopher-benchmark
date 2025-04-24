@@ -1,6 +1,7 @@
 \documentclass[book, a5paper]{jlreq}
 
 \usepackage{luatexja-fontspec}
+\usepackage{zhnumber}
 \usepackage[hidelinks]{hyperref}
 \usepackage{pdfpages}
 \usepackage[pass]{geometry}
@@ -11,25 +12,43 @@
 \setmainjfont[YokoFeatures={JFM=zh_CN/kaiming}, Scale=1, Script=CJK, Language={Chinese Simplified}, BoldFont=SourceHanSerifSC-Bold.otf]{SourceHanSerifSC-Regular.otf}
 \newjfontfamily{\heiti}[YokoFeatures={JFM=zh_CN/kaiming}, Scale=1, Script=CJK, Language={Chinese Simplified}, BoldFont=SourceHanSansSC-Bold.otf]{SourceHanSansSC-Regular.otf}
 \newjfontface{\kaiti}[YokoFeatures={JFM=zh_CN/quanjiao}, Scale=1, Script=CJK]{Fandol Kai}
-\newfontfamily{\handwritten}[Scale=1]{TeX Gyre Chorus}
+\newfontface{\handwritten}[Scale=1]{TeX Gyre Chorus}
+
+\RenewBlockHeading{part}{0}{
+  number=true,
+  label_format={\small 第\zhnum{part}部分},
+  format={{\noindent#1\\#2\\#3}},
+  subtitle_format={#1},
+  font=\Large,
+  subtitle_font=\handwritten\footnotesize,
+  align=center,
+  after_label_space=0pt,
+  lines=15,
+  pagestyle=empty,
+  pagebreak=begin_with_odd_page
+}
 
 \ModifyHeading{chapter}{
-  label_format={},
+  label_format={第\zhnum{chapter}章},
   align=center,
-  font={\Large},
-  format={\noindent #2}
+  font=\large,
+  indent=0pt,
+  after_label_space=1\zw,
+  pagebreak=begin_with_odd_page
 }
 
 \ModifyHeading{section}{
   label_format={},
   align=center,
-  font={\large},
-  format={\noindent #2}
+  font=\large,
+  indent=0pt,
+  after_label_space=0pt
 }
 
-\newcommand{\partition}[2]{\newgeometry{left=3cm,right=3cm}\thispagestyle{empty}\chapter{#1}\par\nopagebreak\vspace{-3\zh}\noindent\begin{center}\handwritten\footnotesize #2\end{center}\par}
-\newcommand{\partquote}[2]{\vspace{9\zh}{\noindent\kaiti\small #1\par\hfill——#2}\par}
-\newcommand{\finishpartition}{\restoregeometry\pagebreak}
+\newcommand{\startpart}[2]{\newgeometry{left=3cm,right=3cm}\part{#1}[#2]}
+\newcommand{\partquote}[2]{{\noindent\kaiti\small #1\par\hfill——#2}}
+\newcommand{\finishpart}{\restoregeometry\cleardoublepage}
+
 \renewcommand{\contentsname}{}
 \setcounter{tocdepth}{0}
 
@@ -41,5 +60,5 @@
 \mainmatter\setlength{\parindent}{2\zw}%
 \include{ghost.tex}\par
 \include{alice.tex}\par
-%\include{god.tex}\par
+% \include{god.tex}\par
 \end{document}
