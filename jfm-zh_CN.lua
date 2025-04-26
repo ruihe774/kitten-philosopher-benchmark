@@ -161,7 +161,7 @@ luatexja.jfont.define_jfm {
     },
     [3] = {
         -- 间隔号
-        chars = {'・', '·'},
+        chars = {'・', '·', '–'},
         align = 'middle',
         left = 0,
         down = 0,
