@@ -1,11 +1,33 @@
 \documentclass[book, a5paper]{jlreq}
 
+\ExplSyntaxOn
+\tl_new:N \l__my_production_status_tl
+\cs_new_protected:Npn \__my_getenv:nN #1 #2
+  {
+    \tl_set:Nx #2
+      {
+        \directlua
+          {
+            tex.sprint ( kpse.var_value ( "\lua_escape:n {#1}" ) or "" )
+          }
+      }
+  }
+
+\__my_getenv:nN { PRODUCTION } \l__my_production_status_tl
+\tl_if_eq:NnTF \l__my_production_status_tl { 1 }
+  {
+    \RequirePackage[pass]{geometry}
+  }
+  {
+    \RequirePackage[pass, showframe]{geometry}
+  }
+\ExplSyntaxOff
+
 \usepackage[no-math]{luatexja-fontspec}
 \usepackage{siunitx}
 \usepackage{zhnumber}
 \usepackage[hidelinks]{hyperref}
 \usepackage{pdfpages}
-\usepackage[pass, showframe]{geometry}
 \usepackage{seqsplit}
 
 \ltjdefcharrange{6}{`⸺}
