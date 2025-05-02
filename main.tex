@@ -35,6 +35,7 @@
 \jlreqsetup{quote_indent=4\zw, quote_end_indent=4\zw,quote_beforeafter_space=0.5\baselineskip}
 \setmainfont[Scale=1]{Source Serif Pro}
 \setmainjfont[YokoFeatures={JFM=zh_CN/kaiming}, Scale=1, Script=CJK, Language={Chinese Simplified}, BoldFont=SourceHanSerifSC-Bold.otf]{SourceHanSerifSC-Regular.otf}
+\newjfontfamily{\quanjiao}[YokoFeatures={JFM=zh_CN/quanjiao}, Scale=1, Script=CJK, Language={Chinese Simplified}, BoldFont=SourceHanSerifSC-Bold.otf]{SourceHanSerifSC-Regular.otf}
 \newjfontfamily{\heiti}[YokoFeatures={JFM=zh_CN/kaiming}, Scale=1, Script=CJK, Language={Chinese Simplified}, BoldFont=SourceHanSansSC-Bold.otf]{SourceHanSansSC-Regular.otf}
 \newjfontface{\kaiti}[YokoFeatures={JFM=zh_CN/quanjiao}, Scale=1, Script=CJK]{Fandol Kai}
 \newfontface{\handwritten}[Scale=1]{TeX Gyre Chorus}
@@ -44,7 +45,7 @@
   label_format={\small 第\zhnum{part}部分},
   format={{\noindent#1\\#2\\#3}},
   subtitle_format={#1},
-  font=\Large,
+  font=\Large\quanjiao,
   subtitle_font=\handwritten\footnotesize,
   align=center,
   after_label_space=0pt,
@@ -56,7 +57,7 @@
 \ModifyHeading{chapter}{
   label_format={第\zhnum{chapter}章},
   align=center,
-  font=\large,
+  font=\large\quanjiao,
   indent=0pt,
   after_label_space=1\zw,
   pagebreak=begin_with_odd_page
@@ -65,7 +66,7 @@
 \ModifyHeading{section}{
   label_format={},
   align=center,
-  font=\large,
+  font=\large\quanjiao,
   indent=0pt,
   after_label_space=0pt
 }
