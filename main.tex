@@ -71,7 +71,7 @@
   after_label_space=0pt
 }
 
-\newcommand{\startpart}[2]{\newgeometry{left=3cm,right=3cm}\part{#1}[#2]}
+\newcommand{\startpart}[2]{\loadgeometry{narrow}\part{#1}[#2]}
 \newcommand{\partquote}[2]{{\noindent\kaiti\small #1\par\hfill——#2}}
 \newcommand{\finishpart}{\restoregeometry\cleardoublepage}
 
@@ -89,9 +89,9 @@
 
 \begin{document}
 \frontmatter\maketitle%
-\newgeometry{left=3cm,right=3cm}\tableofcontents\thispagestyle{empty}\restoregeometry%
+\newgeometry{left=3cm,right=3cm}\savegeometry{narrow}\tableofcontents\thispagestyle{empty}\restoregeometry%
 \mainmatter%
 \include{ghost.tex}\par
 \include{alice.tex}\par
-% \include{god.tex}\par
+\include{god.tex}\par
 \end{document}
