@@ -80,12 +80,14 @@
 \renewcommand{\contentsname}{}
 \setcounter{tocdepth}{0}
 
+\renewcommand{\jlreqparindent}{2\zw}
+
 \title{延迟中的幽灵}
 
 \begin{document}
 \frontmatter\maketitle%
 \newgeometry{left=3cm,right=3cm}\tableofcontents\thispagestyle{empty}\restoregeometry%
-\mainmatter\setlength{\parindent}{2\zw}%
+\mainmatter%
 \include{ghost.tex}\par
 \include{alice.tex}\par
 % \include{god.tex}\par
