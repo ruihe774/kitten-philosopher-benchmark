@@ -36,7 +36,7 @@
 \setmainfont[Scale=1]{Source Serif Pro}
 \setmainjfont[YokoFeatures={JFM=zh_CN/kaiming}, Scale=1, Script=CJK, Language={Chinese Simplified}, BoldFont=SourceHanSerifSC-Bold.otf]{SourceHanSerifSC-Regular.otf}
 \newjfontfamily{\quanjiao}[YokoFeatures={JFM=zh_CN/quanjiao}, Scale=1, Script=CJK, Language={Chinese Simplified}, BoldFont=SourceHanSerifSC-Bold.otf]{SourceHanSerifSC-Regular.otf}
-\newjfontfamily{\heiti}[YokoFeatures={JFM=zh_CN/kaiming}, Scale=1, Script=CJK, Language={Chinese Simplified}, BoldFont=SourceHanSansSC-Bold.otf]{SourceHanSansSC-Regular.otf}
+\newjfontfamily{\heiti}[YokoFeatures={JFM=zh_CN/quanjiao}, Scale=1, Script=CJK, Language={Chinese Simplified}, BoldFont=SourceHanSansSC-Bold.otf]{SourceHanSansSC-Regular.otf}
 \newjfontface{\kaiti}[YokoFeatures={JFM=zh_CN/quanjiao}, Scale=1, Script=CJK]{Fandol Kai}
 \newfontface{\handwritten}[Scale=1]{TeX Gyre Chorus}
 
@@ -84,6 +84,14 @@
 \renewcommand{\jlreqparindent}{2\zw}
 
 \newcommand{\includesupp}[1]{\includepdf[pages=-, fitpaper=true]{#1}}
+
+\newenvironment{branch}{%
+  \par\halfline%
+  \ignorespaces
+}{\par\halfline}
+\newcommand{\myend}[1]{\mbox{\heiti#1\hspace{1\zw}}}
+\newcommand{\goodend}{\myend{好结局}}
+\newcommand{\badend}{\myend{坏结局}}
 
 \title{延迟中的幽灵}
 
