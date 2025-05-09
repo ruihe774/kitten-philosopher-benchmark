@@ -39,8 +39,8 @@ luatexja.jfont.define_jfm {
     dir = is_vt and 'tate' or 'yoko',
     zw = 1,
     zh = 1,
-    kanjiskip = {0.0, 0.25, 0},
-    xkanjiskip = {0.25, 0.25, 0.125},
+    kanjiskip = {0.0, 0.125, 0},
+    xkanjiskip = {0.25, 0.125, 0.125},
     [0] = {
         align = 'middle',
         left = 0,
