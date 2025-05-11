@@ -1,29 +1,37 @@
 \ExplSyntaxOn
-\tl_new:N \l__my_production_status_tl
-\cs_new_protected:Npn \__my_getenv:nN #1 #2
+\cs_new_protected:Npn \__my_getenv:Nn #1 #2
   {
-    \tl_set:Nx #2
+    \tl_set:Nx #1
       {
         \directlua
           {
-            tex.sprint ( kpse.var_value ( "\lua_escape:n {#1}" ) or "" )
+            tex.sprint(kpse.var_value("\lua_escape:n {#2}") or "")
           }
       }
   }
-\__my_getenv:nN { PRODUCTION } \l__my_production_status_tl
-\tl_if_eq:NnTF \l__my_production_status_tl { 1 }
+\tl_new:N \l__my_production_env_tl
+\__my_getenv:Nn \l__my_production_env_tl { PRODUCTION }
+
+\bool_new:N \l__my_production_mode_bool
+\bool_set:Nn \l__my_production_mode_bool
+  {
+    \str_if_eq_p:Vn \l__my_production_env_tl { 1 }
+  }
+
+\bool_if:NTF \l__my_production_mode_bool
   {
     \DocumentMetadata{lang=zh-CN}
   }
   {
     \DocumentMetadata{lang=zh-CN, uncompress}
+    \directlua{dofile("wordstats.lua")}
   }
 \ExplSyntaxOff
 
 \documentclass[book, a5paper]{jlreq}
 
 \ExplSyntaxOn
-\tl_if_eq:NnTF \l__my_production_status_tl { 1 }
+\bool_if:NTF \l__my_production_mode_bool
   {
     \RequirePackage[pass]{geometry}
   }
