@@ -23,17 +23,23 @@
   }
 \ExplSyntaxOff
 
-\usepackage[no-math]{luatexja-fontspec}
+\usepackage{luatexja-fontspec}
+\usepackage{unicode-math}
 \usepackage[hidelinks]{hyperref}
-\usepackage{siunitx}
+\usepackage[mode=math, per-mode=symbol]{siunitx}
 \usepackage{zhnumber}
 \usepackage{graphicx}
 \usepackage{pdfpages}
 \usepackage{seqsplit}
 
+\DeclareSIUnit\angstrom{Å}
+
 \ltjdefcharrange{6}{`⸺}
 \ltjenableadjust[priority=true]
-\setmainfont[Scale=1]{Source Serif Pro}
+\setmainfont[Scale=1]{STIX Two Text}
+\setmathfont{STIX Two Math}
+\newfontfamily{\sanspro}[Scale=1]{Source Sans Pro}
+\newfontfamily{\hanji}[Scale=1, Script=CJK, Language={Chinese Simplified}, BoldFont=SourceHanSerifSC-Bold.otf]{SourceHanSerifSC-Regular.otf}
 \setmainjfont[YokoFeatures={JFM=zh_CN/kaiming}, Scale=1, Script=CJK, Language={Chinese Simplified}, BoldFont=SourceHanSerifSC-Bold.otf]{SourceHanSerifSC-Regular.otf}
 \newjfontfamily{\quanjiao}[YokoFeatures={JFM=zh_CN/quanjiao}, Scale=1, Script=CJK, Language={Chinese Simplified}, BoldFont=SourceHanSerifSC-Bold.otf]{SourceHanSerifSC-Regular.otf}
 \newjfontfamily{\heiti}[YokoFeatures={JFM=zh_CN/quanjiao}, Scale=1, Script=CJK, Language={Chinese Simplified}, BoldFont=SourceHanSansSC-Bold.otf]{SourceHanSansSC-Regular.otf}
@@ -41,7 +47,7 @@
 \newfontface{\handwritten}[Scale=1]{TeX Gyre Chorus}
 \jlreqsetup{quote_indent=4\zw, quote_end_indent=4\zw,quote_beforeafter_space=0.5\baselineskip, caption_font=\quanjiao, caption_label_format={\vphantom{图}}, caption_after_label_space=0pt}
 
-\RenewBlockHeading{part}{0}{
+\RenewBlockHeading{part}{-1}{
   number=true,
   label_format={\small 第\zhnum{part}部分},
   format={{\noindent#1\\#2\\#3}},
@@ -71,6 +77,31 @@
   indent=0pt,
   after_label_space=0pt
 }
+
+\NewBlockHeading{block}{1}{
+  number=true,
+  label_format={\makebox[20pt][r]{\makebox[2\zw][l]{\zhnum{block}、}}},
+  font=\large\quanjiao\bfseries,
+  align=left,
+  after_label_space=0pt,
+  lines=1.5
+}
+
+\NewBlockHeading{subblock}{2}{
+  number=true,
+  label_format={\makebox[2\zw][l]{\thesubblock.}},
+  font=\heiti\bfseries,
+  after_label_space=0pt,
+  align=left
+}
+
+\makeatletter
+\providecommand*{\toclevel@block}{1}
+\providecommand*{\toclevel@subblock}{2}
+\@addtoreset{subblock}{block}
+\makeatother
+
+\newcommand{\htbox}[1]{\mbox{\sanspro\heiti #1}}
 
 \newcommand{\startpart}[2]{\loadgeometry{narrow}\part{#1}[#2]}
 \newcommand{\partquote}[2]{{\noindent\kaiti\small #1\par\hfill——#2}}
