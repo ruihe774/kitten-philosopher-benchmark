@@ -51,19 +51,28 @@
 
 \DeclareSIUnit\angstrom{Å}
 
+\defaultfontfeatures{Scale=1, Ligatures=Common}
+\setmainfont{STIX Two Text}
+\setmathfont{STIX Two Math}
+\newfontfamily{\sans}{Source Sans Pro}
+\newfontfamily{\hanji}[Renderer=Basic, Script=CJK, Language={Chinese Simplified}, BoldFont=SourceHanSerifSC-Bold.otf]{SourceHanSerifSC-Regular.otf}
+\newfontface{\dotfont}[Renderer=Basic]{Latin Modern Roman}
+\setmainjfont[YokoFeatures={JFM=zh_CN/kaiming}, Script=CJK, Language={Chinese Simplified}, BoldFont=SourceHanSerifSC-Bold.otf]{SourceHanSerifSC-Regular.otf}
+\newjfontfamily{\quanjiao}[YokoFeatures={JFM=zh_CN/quanjiao}, Script=CJK, Language={Chinese Simplified}, BoldFont=SourceHanSerifSC-Bold.otf]{SourceHanSerifSC-Regular.otf}
+\newjfontfamily{\heiti}[YokoFeatures={JFM=zh_CN/quanjiao}, Script=CJK, Language={Chinese Simplified}, BoldFont=SourceHanSansSC-Bold.otf]{SourceHanSansSC-Regular.otf}
+\newjfontface{\kaiti}[YokoFeatures={JFM=zh_CN/quanjiao}, Script=CJK]{Fandol Kai}
+\newfontface{\handwritten}{TeX Gyre Chorus}
+
 \ltjdefcharrange{6}{`⸺}
 \ltjenableadjust[priority=true]
-\setmainfont[Scale=1]{STIX Two Text}
-\setmathfont{STIX Two Math}
-\newfontfamily{\sanspro}[Scale=1]{Source Sans Pro}
-\newfontfamily{\hanji}[Scale=1, Script=CJK, Language={Chinese Simplified}, BoldFont=SourceHanSerifSC-Bold.otf]{SourceHanSerifSC-Regular.otf}
-\newfontface{\dotfont}{Latin Modern Roman}
-\setmainjfont[YokoFeatures={JFM=zh_CN/kaiming}, Scale=1, Script=CJK, Language={Chinese Simplified}, BoldFont=SourceHanSerifSC-Bold.otf]{SourceHanSerifSC-Regular.otf}
-\newjfontfamily{\quanjiao}[YokoFeatures={JFM=zh_CN/quanjiao}, Scale=1, Script=CJK, Language={Chinese Simplified}, BoldFont=SourceHanSerifSC-Bold.otf]{SourceHanSerifSC-Regular.otf}
-\newjfontfamily{\heiti}[YokoFeatures={JFM=zh_CN/quanjiao}, Scale=1, Script=CJK, Language={Chinese Simplified}, BoldFont=SourceHanSansSC-Bold.otf]{SourceHanSansSC-Regular.otf}
-\newjfontface{\kaiti}[YokoFeatures={JFM=zh_CN/quanjiao}, Scale=1, Script=CJK]{Fandol Kai}
-\newfontface{\handwritten}[Scale=1]{TeX Gyre Chorus}
-\jlreqsetup{quote_indent=4\zw, quote_end_indent=4\zw,quote_beforeafter_space=0.5\baselineskip, caption_font=\quanjiao, caption_label_format={\vphantom{图}}, caption_after_label_space=0pt}
+\jlreqsetup{
+  quote_indent=4\zw,
+  quote_end_indent=4\zw,
+  quote_beforeafter_space=0.5\baselineskip,
+  caption_font=\quanjiao,
+  caption_label_format={\vphantom{图}},
+  caption_after_label_space=0pt
+}
 
 \RenewBlockHeading{part}{-1}{
   number=true,
@@ -119,7 +128,7 @@
 \@addtoreset{subblock}{block}
 \makeatother
 
-\newcommand{\htbox}[1]{\mbox{\sanspro\heiti #1}}
+\newcommand{\htbox}[1]{\mbox{\sans\heiti #1}}
 \newcommand{\underdot}[1]{\ltjkenten[intergap=-1.3, fontcmd=\dotfont]{#1}}
 
 \newcommand{\startpart}[2]{\loadgeometry{narrow}\part{#1}[#2]}
