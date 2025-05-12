@@ -105,28 +105,36 @@
   after_label_space=0pt
 }
 
-\NewBlockHeading{block}{1}{
+\makeatletter
+\newcommand{\providegeometry}[2]{\@ifundefined{Gm@restore@@#1}{\newgeometry{#2}\savegeometry{#1}}{\loadgeometry{#1}}}
+\makeatother
+
+\newcommand{\inputsupp}[1]{%
+\clearpage%
+\providegeometry{large}{margin=1.5cm, foot=1\baselineskip, includefoot}\savegeometry{large}%
+\SaveHeading{section}{\restoresection}%
+\RenewBlockHeading{section}{1}{
   number=true,
-  label_format={\makebox[20pt][r]{\makebox[2\zw][l]{\zhnum{block}、}}},
+  label_format={\makebox[20pt][r]{\makebox[2\zw][l]{\zhnum{section}、}}},
   font=\large\quanjiao\bfseries,
   align=left,
   after_label_space=0pt,
   lines=1.5
-}
-
-\NewBlockHeading{subblock}{2}{
+}%
+\SaveHeading{subsection}{\restoresubsection}%
+\RenewBlockHeading{subsection}{2}{
   number=true,
-  label_format={\makebox[2\zw][l]{\thesubblock.}},
+  label_format={\makebox[2\zw][l]{\arabic{subsection}.}},
   font=\heiti\bfseries,
   after_label_space=0pt,
   align=left
+}%
+\input{supp-#1.tex}%
+\restoregeometry%
+\clearpage%
+\restoresubsection%
+\restoresection%
 }
-
-\makeatletter
-\providecommand*{\toclevel@block}{1}
-\providecommand*{\toclevel@subblock}{2}
-\@addtoreset{subblock}{block}
-\makeatother
 
 \newcommand{\htbox}[1]{\mbox{\sans\heiti #1}}
 \newcommand{\underdot}[1]{\ltjkenten[intergap=-1.3, fontcmd=\dotfont]{#1}}
