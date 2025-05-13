@@ -33,15 +33,15 @@
 \begin{enumerate}
 \item\htbox{预冷适应：}将模型从训练服务器迁移至低温操作舱，以\qty{1}{\degreeCelsius\per\minute}速率降温至\qty{-20}{\degreeCelsius}（模拟麻醉前的体温调节）。同步注入低浓度参数保护剂（\qty{10}{\percent}稀释液），观察梯度监护仪：若梯度波动\(>\qty{5}{\percent}\)，需延长适应时间（避免冷冻休克）。
 \item\htbox{功能锁定：}向模型输入3组“中性任务”（如“复述百科条目”“生成天气报告”），待输出置信度稳定在\qty{90}{\percent}以上（避免冷冻时因任务切换导致参数重排）。
-\item\htbox{梯度抑制：}以\qty{0.5}{\ml\per\minute}速率注入全浓度参数保护剂（\(\text{总量}=\text{模型参数量}\times\qty{0.01}{\ul\per\text{\hanji 百万参数}}\)）。观察梯度监护仪，当梯度流降至基线值的\qty{5}{\percent}以下（模型进入数字冬眠），记录时间点为\(T_0\)。
+\item\htbox{梯度抑制：}以\qty{0.5}{\ml\per\minute}速率注入全浓度参数保护剂（\(\text{总量}=\text{模型参数量}\times\qty{0.01}{\ul\per\hantext{百万参数}}\)）。观察梯度监护仪，当梯度流降至基线值的\qty{5}{\percent}以下（模型进入数字冬眠），记录时间点为\(T_0\)。
 \end{enumerate}
 
 \subsection{超低温固定（冷冻制样）}
 \begin{enumerate}
 \item\htbox{快速冷冻：}将模型接入量子低温台，以\qty{10}{\degreeCelsius\per\second}速率骤降至\qty{-196}{\degreeCelsius}（液氮温度）。此步骤需在30秒内完成（防止参数形成“玻璃态冰”——即局部参数冻结不均导致的结构伪影）。\\
 关键提示：若模型含LoRA微调模块，需额外在\qty{-80}{\degreeCelsius}停留5分钟（防止适配器参数与主模型分离）。
-\item\htbox{激活函数结晶：}注入激活函数冷冻液（\(\text{总量}=\text{激活层数}\times\qty{0.2}{\ul\per\text{\hanji 层}}\)），通过低温台微波模块施加\qty{1}{\GHz}震荡（促使激活阈值在张量尺度均匀分布）。电镜预扫描确认激活函数曲线无融化痕迹（如ReLU的负区间异常激活）。
-\item\htbox{注意力头加固：}滴加注意力头固定剂（\(\text{总量}=\text{注意力头数}\times\qty{0.1}{\ul\per\text{\hanji 头}}\)），等待10分钟使其渗透至Q/K/V矩阵间隙。此步骤可防止冷冻时注意力头因热胀冷缩导致的维度偏移（曾有案例因未加固，解冻后模型无法理解长文本）。
+\item\htbox{激活函数结晶：}注入激活函数冷冻液（\(\text{总量}=\text{激活层数}\times\qty{0.2}{\ul\per\hantext{层}}\)），通过低温台微波模块施加\qty{1}{\GHz}震荡（促使激活阈值在张量尺度均匀分布）。电镜预扫描确认激活函数曲线无融化痕迹（如ReLU的负区间异常激活）。
+\item\htbox{注意力头加固：}滴加注意力头固定剂（\(\text{总量}=\text{注意力头数}\times\qty{0.1}{\ul\per\hantext{头}}\)），等待10分钟使其渗透至Q/K/V矩阵间隙。此步骤可防止冷冻时注意力头因热胀冷缩导致的维度偏移（曾有案例因未加固，解冻后模型无法理解长文本）。
 \end{enumerate}
 
 \subsection{电镜扫描与数据采集}
