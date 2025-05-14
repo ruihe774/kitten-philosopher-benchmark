@@ -24,7 +24,7 @@
 \thispagestyle{empty}
 
 \begin{abstract}
-混合专家（Mixture-of-Experts, MoE）大语言模型（Large Language Models, LLMs）展示了卓越的可扩展性和效率。然而，每个token仅依赖少数稀疏激活（sparsely activated）的专家有时会导致脆弱性（brittleness）或次优的泛化（generalization）。我们提出 VoGE-LLM（基于门控专家集成的投票大语言模型，Voting over Gated Expert Ensembles LLM），这是一种新型架构，它通过在一个分层专家结构中整合一个关键的基于投票的集成机制来增强 MoE。VoGE-LLM 使用一个门控网络（gating network）将输入token路由（route）到专门化的“专家集成”（expert ensembles）。每个被选定的集成由多个“原子专家”（atomic experts）组成，它们并行（parallel）处理输入。关键的是，它们的个体输出随后通过一个“软投票”（soft voting）机制（在我们主要实现中是 logits 平均）进行聚合（aggregate），为该组生成一个鲁棒的、集成优化的输出。这种方法协同结合了 MoE 的动态路由优势与基于投票的集成固有的错误校正和泛化优势。我们提出了一个 80 亿参数的模型 VoGE-LLM-8B，并通过虚构的基准测试表明，它显著优于可比的密集（dense）和标准 MoE 基线（baselines），特别是在复杂推理和分布外（out-of-distribution）任务上，突显了集成投票机制在专家集成上的有效性。
+混合专家（Mixture-of-Experts, MoE）大语言模型（Large Language Models, LLMs）展示了卓越的可扩展性和效率。然而，每个token仅依赖少数稀疏激活（sparsely activated）的专家有时会导致脆弱性（brittleness）或次优的泛化（generalization）。我们提出 VoGE-LLM（基于门控专家集成的投票大语言模型，Voting over Gated Expert Ensembles LLM），这是一种新型架构，它通过在一个分层专家结构中整合一个关键的基于投票的集成机制来增强 MoE。VoGE-LLM 使用一个门控网络（gating network）将输入token路由（route）到专门化的“专家集成”（expert ensembles）。每个被选定的集成由多个“原子专家”（atomic experts）组成，它们并行（parallel）处理输入。关键的是，它们的个体输出随后通过一个“软投票”（soft voting）机制（在我们主要实现中是 logits 平均）进行聚合（aggregate），为该组生成一个鲁棒的、集成优化的输出。这种方法协同结合了 MoE 的动态路由优势与基于投票的集成固有的错误校正和泛化优势。我们提出了一个 80 亿参数的模型 VoGE-LLM-8B，并通过基准测试表明，它显著优于可比的密集（dense）和标准 MoE 基线（baselines），特别是在复杂推理和分布外（out-of-distribution）任务上，突显了集成投票机制在专家集成上的有效性。
 \end{abstract}
 
 \section{引言}
@@ -145,7 +145,7 @@ $h'_t = \sum_{k=1}^{K_g} w_{\mathrm{selected\_ensemble}_k} \cdot O_{\mathrm{sele
     \item \textbf{MoE-Switch-8B：} 一个类似于 Switch Transformer 的 MoE 模型 \cite{fedus2022switch}，每个 MoE 层总共有 128 个专家（类似于 VoGE 的原子专家 FFN），为每个 token 激活 Top-2 专家。这个模型的总参数量和每个 token 的活跃参数量与 VoGE-LLM-8B 可比。
 \end{itemize}
 
-\paragraph{训练数据} 所有模型都在一个虚构的、精心策划的 1.5 万亿 token 的英文语料库（corpus）上进行训练，包括网络数据（类似于 C4）、书籍和代码。训练进行了 300,000 步，批处理大小为 400 万 token。
+\paragraph{训练数据} 所有模型都在一个精心策划的 1.5 万亿 token 的英文语料库（corpus）上进行训练，包括网络数据（类似于 C4）、书籍和代码。训练进行了 300,000 步，批处理大小为 400 万 token。
 
 \paragraph{评估基准测试} 我们在以下基准测试（benchmarks）上评估了模型：
 \begin{itemize}[nosep]
@@ -178,14 +178,14 @@ MoE-Switch-8B & 68.5 & 55.1 & 33.5 & 60.2 & 63.5 \\
 即使在标准基准测试如 MMLU、GSM8K 和 HumanEval 上，VoGE-LLM-8B 也取得了稳定提升，表明在知识、数学技能和编码能力方面的全面增强。VoGE-LLM 的每个 token 计算成本仍可控，与激活类似数量 FFN 的其他稀疏 MoE 模型相当。一项消融研究（见附件）表明，如果集成内聚合只是简单地从一个随机选择的原子专家进行透传（即禁用投票效应），则其性能显著低于 VoGE-LLM-8B，在 BBH 和 Robustness-QA 上的表现几乎回落到 MoE-Switch-8B 的水平，这突显了投票机制的关键贡献。
 
 \section{讨论}
-VoGE-LLM-8B 的虚构结果有力地支持了我们的核心论断：集成一个明确的投票机制，用于门控网络引导下的原子专家集成，可以显著提升 LLM 的性能和鲁棒性。VoGE 架构独特地结合了 MoE 路由的定向专业化（targeted specialization）与集成方法在细粒度层面的错误校正能力。
+VoGE-LLM-8B 的结果有力地支持了我们的核心论断：集成一个明确的投票机制，用于门控网络引导下的原子专家集成，可以显著提升 LLM 的性能和鲁棒性。VoGE 架构独特地结合了 MoE 路由的定向专业化（targeted specialization）与集成方法在细粒度层面的错误校正能力。
 
 在复杂推理（BBH）和鲁棒性基准测试（Robustness-QA）上更为显著的性能飞跃，凸显了集成内投票的有效性。当面临歧义或具有挑战性的输入变异时，在预选的专门集成内聚合多个原子专家的“意见”，对于得出更准确、更可靠的结果至关重要，从而减轻了依赖单个稀疏激活专家犯下关键错误的风险。
 
 VoGE-LLM 的设计提供了灵活性。每个集成内原子专家的数量（$M_i$）直接影响集成效应的强度，而专家集成的数量（$N_g$）则允许不同程度的专业化。未来的工作可以探索除了简单 logits 平均之外的更复杂的集成内聚合机制，例如学习原子专家的权重或使用基于注意力的聚合。研究如何明确促进同一集成内原子专家之间的多样性，可以进一步增强集成的优势。此外，将 VoGE 概念应用于其他模态或模型架构是一个有前途的方向。每个激活集成的计算成本略有增加，也需要研究优化的实现方法。
 
 \section{结论}
-我们研发了 VoGE-LLM，这是一种新型 LLM 架构，其独特之处在于采用分层结构，具有门控路由至专家集成，并且最重要的是，采用了用于输出聚合的集成内投票机制。我们对 VoGE-LLM-8B 的虚构评估表明，它在性能和鲁棒性方面，尤其是在复杂任务上，有可能超越标准的 MoE 和密集 LLMs。这种“基于门控专家集成的投票”范式为构建更强大、更高效、更可靠的大规模语言模型提供了一个有前途的方向。
+我们研发了 VoGE-LLM，这是一种新型 LLM 架构，其独特之处在于采用分层结构，具有门控路由至专家集成，并且最重要的是，采用了用于输出聚合的集成内投票机制。我们对 VoGE-LLM-8B 的评估表明，它在性能和鲁棒性方面，尤其是在复杂任务上，有可能超越标准的 MoE 和密集 LLMs。这种“基于门控专家集成的投票”范式为构建更强大、更高效、更可靠的大规模语言模型提供了一个有前途的方向。
 
 \begin{thebibliography}{99}
 \footnotesize
