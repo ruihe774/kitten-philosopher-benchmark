@@ -1,0 +1,224 @@
+\documentclass[a5paper, 10pt, punct=kaiming, linespread=1.2, fontset=fandol]{ctexart}
+\usepackage[margin=1.5cm, foot=15pt, includefoot]{geometry}
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage{enumitem}
+\usepackage{tikz}
+\usetikzlibrary{positioning, shapes.geometric, arrows.meta, calc, fit}
+
+\title{\Large VoGE-LLM：\\门控专家集成投票增强大语言模型鲁棒性与性能}
+\author{\normalsize 臭蛤蟆\textsuperscript{1}, 帽匠\textsuperscript{1}, 画匠\textsuperscript{1}, 老马\textsuperscript{1} \\
+\small \textsuperscript{1}茶会大学，海汶城}
+\date{\small 2025年5月}
+\pagestyle{empty}
+\widowpenalty=10000
+
+\begin{document}
+\maketitle
+\thispagestyle{empty}
+
+\begin{abstract}
+混合专家（Mixture-of-Experts, MoE）大语言模型（Large Language Models, LLMs）展示了卓越的可扩展性和效率。然而，每个token仅依赖少数稀疏激活（sparsely activated）的专家有时会导致脆弱性（brittleness）或次优的泛化（generalization）。我们提出 VoGE-LLM（基于门控专家集成的投票大语言模型，Voting over Gated Expert Ensembles LLM），这是一种新型架构，它通过在一个分层专家结构中整合一个关键的基于投票的集成机制来增强 MoE。VoGE-LLM 使用一个门控网络（gating network）将输入token路由（route）到专门化的“专家集成”（expert ensembles）。每个被选定的集成由多个“原子专家”（atomic experts）组成，它们并行（parallel）处理输入。关键的是，它们的个体输出随后通过一个“软投票”（soft voting）机制（在我们主要实现中是 logits 平均）进行聚合（aggregate），为该组生成一个鲁棒的、集成优化的输出。这种方法协同结合了 MoE 的动态路由优势与基于投票的集成固有的错误校正和泛化优势。我们提出了一个 80 亿参数的模型 VoGE-LLM-8B，并通过虚构的基准测试表明，它显著优于可比的密集（dense）和标准 MoE 基线（baselines），特别是在复杂推理和分布外（out-of-distribution）任务上，突显了集成投票机制在专家集成上的有效性。
+\end{abstract}
+
+\section{引言}
+
+大语言模型（LLMs）已成为人工智能的基础，支撑着广泛的自然语言理解和生成任务。对更强大 LLMs 的追求导致模型规模的爆炸式增长。然而，训练和部署这些庞大的密集（dense）模型会产生巨大的计算成本。混合专家（Mixture-of-Experts, MoE）架构 \cite{shazeer2017outrageously, fedus2022switch, du2022glam} 已成为一个有前途的解决方案，通过对每个输入 token 仅稀疏激活（sparsely activating）专家子网络的一个子集，使得模型能够扩展到万亿参数，同时保持每个 token 的活跃计算量恒定，从而管理计算成本。
+
+尽管 MoE 模型如 Switch Transformers \cite{fedus2022switch} 和 GLaM \cite{du2022glam} 在高参数量和减少 FLOPs 的情况下取得了令人瞩目的性能，但它们通常依赖于为每个 token 选择少数（通常是 top-1 或 top-2）激活的专家，这可能带来挑战。门控网络做出的路由决策至关重要；不正确的路由可能导致次优的专家选择。此外，单个专家的专业化（specialization）虽然有利于效率，但如果选定的专家不适合处理特定的细微输入，或者如果它学到了虚假相关性（spurious correlations），模型的鲁棒性可能会受到限制。最近的工作探讨了改进 MoE 的稳定性和可迁移性，发展了 MoE 在 LLM 中的应用 \cite{zoph2022stable}。
+
+分层 MoE（Hierarchical MoE, HMoE）的概念 \cite{jordan1994hierarchical} 提供了一种以更细粒度（finer granularity）的方式组织专家的方法。在此基础上，一些最近的工作提出了专家分组（expert grouping）或专门的路由。例如，MoGE \cite{moge2025} 引入分组来实现不变表示的学习，而 HMoRA \cite{hmora2025} 利用分层 MoE 进行参数高效微调（parameter-efficient fine-tuning）。这些方法突出了更复杂的专家组织结构的潜在优势。
+
+集成方法（Ensemble methods）是机器学习中一种成熟的技术，通过结合多个模型的预测来提高模型的鲁棒性和性能 \cite{jacobs1991adaptive}。其核心思想是多样化的模型倾向于犯不同的错误，而聚合它们的输出可以带来更好的整体预测。投票机制（Voting），特别是让多个不同的预测器共同决定最终结果的方式，已知可以减轻单个模型的错误并提高整体性能。虽然集成在整个模型的层面很常见，但在 MoE 层的细粒度结构中整合此类机制，为性能提升提供了一条新颖的途径。
+
+在本文中，我们提出了 VoGE-LLM（基于门控专家集成的投票大语言模型，Voting over Gated Expert Ensembles LLM）。我们的关键创新在于在一个分层专家结构中，明确集成了基于投票的集成策略。VoGE-LLM 的特点包括：
+\begin{enumerate}[label=(\alph*), nosep]
+    \item \textbf{门控路由至专家集成：} 一个门控网络动态地将输入 token 路由到一个或多个专门化的“专家集成”，每个集成专门处理某些类型的输入。
+    \item \textbf{集成内的并行原子专家：} 每个被选定的专家集成包含多个“原子专家”，它们并行处理输入 token。
+    \item \textbf{集成内投票/聚合：} 至关重要的是，这些原子专家的个体输出通过一个“软投票”机制（在我们当前的实现中是 logits 平均）进行聚合。这个步骤旨在为该集成的输出产生一个比任何单个原子专家更鲁棒和精细的结果。
+\end{enumerate}
+这种分层投票方法旨在利用稀疏 MoE 门控的效率，同时通过集成内投票过程显著提升鲁棒性和准确性。我们假设这种明确的投票步骤对于在需要复杂推理和强大泛化的任务上取得卓越性能至关重要。
+
+\section{结果与方法}
+
+\subsection{VoGE-LLM 架构}
+VoGE-LLM 架构基于标准的 Transformer 解码器框架。其核心创新在于将 MoE 层替换为 VoGE（基于门控专家集成的投票）层。
+
+\paragraph{总体结构} 如图 \ref{fig:voge_arch} 所示，输入 token 序列首先由共享嵌入层处理。在每个 VoGE 层中，每个 token 的表示 $h_t$ 被送入门控网络。
+
+\paragraph{门控网络} 门控网络 $G$ 是一个小型的前馈网络（例如，一个线性层后接 Softmax 激活函数），它输出一个关于 $N_g$ 个预定义专家集成的概率分布：$P_\mathrm{groups} = \text{Softmax}(\text{Linear}(h_t))$。我们选择 Top-$K_g$ 个概率最高的专家集成进行激活，以用于后续计算。对于 VoGE-LLM-8B，我们设置 $N_g=32$ 和 $K_g=2$。
+
+\paragraph{专家集成与原子专家} 每个专家集成 $EE_i$ 包含 $M_i$ 个原子专家 $\{AE_{i,1}$, \ldots, $AE_{i,M_i}\}$。在 VoGE-LLM-8B 中，所有组的 $M_i=4$。每个原子专家是一个标准的 Transformer 前馈网络块（FFN block），具有独立的参数。当专家集成 $EE_i$ 被激活时，输入表示 $h_t$ 被传递给该集成内的所有 $M_i$ 个原子专家。
+
+\begin{figure*}[t]
+\centering\makebox[0pt][c]{%
+    \begin{tikzpicture}[
+        scale=0.6,
+        transform shape,
+        font=\sf\small,
+        block/.style={rectangle, draw, fill=gray!20, text width=6em, text centered, rounded corners, minimum height=2.5em},
+        eg_block/.style={rectangle, draw, fill=gray!10, text width=6em, text centered, rounded corners, minimum height=2em, alias=expert_ensemble},
+        atomic_expert/.style={rectangle, draw, fill=gray!15, text width=6em, text centered, rounded corners, minimum height=1.8em},
+        gate/.style={diamond, draw, fill=gray!20, aspect=1.5, text centered, minimum size=2em},
+        vote_agg/.style={ellipse, draw, fill=gray!20, text centered, minimum width=4em},
+        io/.style={rectangle, draw, fill=gray!5, text width=5em, text centered, minimum height=2.5em},
+        connector/.style={-Stealth, thick}
+    ]
+    \node[io] (input) {输入 Token $h_t$};
+    \node[gate, right=0.6cm of input] (gating) {门控网络};
+
+    \node[eg_block, above right=0.3cm and 1.6cm of gating] (ee1) {专家集成 1 (Top-K)};
+    \node[eg_block, below right=0.3cm and 1.6cm of gating] (eek) {专家集成 $k$ (Top-K)};
+
+    \coordinate (ref_point_for_ee_other1) at ($ (gating.east)!0.5!(ee1.west) + (0,2.2cm) $);
+    \node[eg_block, right=0.5cm of ref_point_for_ee_other1, dashed, fill=gray!5] (ee_other1) {专家集成 (未激活)};
+
+    \coordinate (ref_point_for_ee_other2) at ($ (gating.east)!0.5!(eek.west) - (0,2.2cm) $);
+    \node[eg_block, right=0.5cm of ref_point_for_ee_other2, dashed, fill=gray!5] (ee_other2) {专家集成 (未激活)};
+
+    \node[atomic_expert, right=0.8cm of ee1] (ae11) {原子专家 \ttfamily 1.1};
+    \node[atomic_expert, below=0.1cm of ae11] (ae1m) {原子专家 \ttfamily 1.M};
+    \node[below=0.05cm of ae11, yshift=0.15cm] (dots1) {\vdots};
+
+    \node[atomic_expert, right=0.8cm of eek] (aek1) {原子专家 \ttfamily k.1};
+    \node[atomic_expert, below=0.1cm of aek1] (aekm) {原子专家 \ttfamily k.M};
+    \node[below=0.05cm of aek1, yshift=0.15cm] (dotsk) {\vdots};
+
+    \node[vote_agg, right=0.7cm of ae1m, yshift=0.3cm] (vote1) {集成内投票};
+    \node[vote_agg, right=0.7cm of aekm, yshift=0.3cm] (votek) {集成内投票};
+
+    \coordinate (mid_votes_east_anchor) at ($(vote1.east)!0.5!(votek.east)$);
+    \node[block, right=0.6cm of mid_votes_east_anchor, text width=6em, minimum height=3em] (final_agg) {跨集成聚合 (加权求和)};
+    \node[io, right=0.6cm of final_agg] (output) {输出 $h'_t$};
+
+    \draw[connector] (input) -- (gating);
+    \draw[connector] (gating.east) -- ++(0.4,0) |- (ee1.west);
+    \draw[connector] (gating.east) -- ++(0.4,0) |- (eek.west);
+    \draw[connector] (gating.east) -- ++(0.4,0) |- (ee_other1.west);
+    \draw[connector] (gating.east) -- ++(0.4,0) |- (ee_other2.west);
+
+    \draw[connector] (ee1.east) -- ++(0.2,0) |- (ae11.west);
+    \draw[connector] (ee1.east) -- ++(0.2,0) |- (ae1m.west);
+
+    \draw[connector] (eek.east) -- ++(0.2,0) |- (aek1.west);
+    \draw[connector] (eek.east) -- ++(0.2,0) |- (aekm.west);
+
+    \draw[connector] (ae11.east) -- (vote1.west);
+    \draw[connector] (ae1m.east) -- (vote1.west);
+
+    \draw[connector] (aek1.east) -- (votek.west);
+    \draw[connector] (aekm.east) -- (votek.west);
+
+    \draw[connector] (vote1.east) -- (final_agg.west);
+    \draw[connector] (votek.east) -- (final_agg.west);
+    \draw[connector] (final_agg.east) -- (output.west);
+
+    \node[draw, rounded corners, fit=(ae11) (ae1m) (dots1), inner sep=0.1cm, label={[yshift=-0.1cm, xshift=1.7cm]above left:\scriptsize 并行原子专家}] {};
+    \node[draw, rounded corners, fit=(aek1) (aekm) (dotsk), inner sep=0.1cm, label={[yshift=-0.1cm, xshift=1.7cm]above left:\scriptsize 并行原子专家}] {};
+    \end{tikzpicture}
+}%
+\caption{VoGE-LLM 层架构示意图。门控网络将输入 token 表示 $h_t$ 路由到 Top-$K_g$ 个专家集成。在每个被选定的集成内（例如专家集成 1），$M$ 个原子专家并行处理 $h_t$。它们的输出通过一个关键的集成内投票（Intra-Ensemble VOTING）机制进行聚合。来自被选定集成的聚合输出随后合并以产生 $h'_t$。}%
+\label{fig:voge_arch}%
+\end{figure*}
+
+\paragraph{集成内投票/聚合（核心创新）} 这是 VoGE-LLM 的基石。来自激活的集成 $EE_i$ 内的 $M_i$ 个原子专家的输出 $O_{AE_{i,j}}$ 被聚合成一个单一的、鲁棒的输出 $O_{\mathrm{ensemble}_i}$。对于 VoGE-LLM-8B，我们将其实现为通过 logits 平均的“软投票”：
+$O_{\mathrm{ensemble}_i} = \frac{1}{M_i} \sum_{j=1}^{M_i} O_{AE_{i,j}}$。
+这种对专门集成内多个独立原子专家的 logits 进行平均，作为一种强大的机制，可以减少方差，并提高该 token 特定上下文（由门控决定）表示的质量。
+
+\paragraph{跨集成聚合} 来自 $K_g$ 个被选定专家集成的精炼输出 $O_{\mathrm{ensemble}_i}$ 根据门控网络分配的权重 $w_i$ 进行组合：
+$h'_t = \sum_{k=1}^{K_g} w_{\mathrm{selected\_ensemble}_k} \cdot O_{\mathrm{selected\_ensemble}_k}$。
+
+\paragraph{训练目标} 模型采用端到端的方式进行训练，总损失函数为 $L_\mathrm{total} = L_\mathrm{lm} + \alpha \cdot L_\mathrm{aux}$，其中 $L_\mathrm{lm}$ 是标准的交叉熵语言模型损失（cross-entropy language modeling loss），而 $L_\mathrm{aux}$ 是一个辅助负载均衡损失（auxiliary load balancing loss） \cite{shazeer2017outrageously}（$\alpha=0.01$），用于鼓励门控网络将 token 相对均匀地分配给专家集成。
+
+\subsection{实验设置}
+\paragraph{模型变体} 我们开发了 VoGE-LLM-8B 模型，总参数量约为 80 亿。它包含 32 个 VoGE 层，每个层有 $N_g=32$ 个专家集成，每个集成包含 $M_i=4$ 个原子专家。门控网络为每个 token 激活 $K_g=2$ 个专家集成。因此，每个 VoGE 层每个 token 有 $2 \times 4 = 8$ 个原子 FFN 处于活跃状态。每个原子专家 FFN 的隐藏层大小为 2048，中间层大小为 $4 \times 2048$。基础 Transformer 架构使用 4096 的嵌入维度（embedding dimension）和 32 个注意力头（attention heads）。
+
+\paragraph{基线}
+\begin{itemize}[nosep]
+    \item \textbf{Dense-7B：} 一个参数量约为 70 亿的标准密集 Transformer LLM，在相同数据上训练。
+    \item \textbf{MoE-Switch-8B：} 一个类似于 Switch Transformer 的 MoE 模型 \cite{fedus2022switch}，每个 MoE 层总共有 128 个专家（类似于 VoGE 的原子专家 FFN），为每个 token 激活 Top-2 专家。这个模型的总参数量和每个 token 的活跃参数量与 VoGE-LLM-8B 可比。
+\end{itemize}
+
+\paragraph{训练数据} 所有模型都在一个虚构的、精心策划的 1.5 万亿 token 的英文语料库（corpus）上进行训练，包括网络数据（类似于 C4）、书籍和代码。训练进行了 300,000 步，批处理大小为 400 万 token。
+
+\paragraph{评估基准测试} 我们在以下基准测试（benchmarks）上评估了模型：
+\begin{itemize}[nosep]
+    \item \textbf{MMLU} \cite{hendrycks2021measuring}：5-shot 平均准确率，用于评估广泛的知识理解。
+    \item \textbf{GSM8K} \cite{cobbe2021training}：Pass@1 准确率，用于评估小学数学推理能力。
+    \item \textbf{HumanEval} \cite{chen2021evaluating}：Pass@1 准确率，用于评估 Python 代码生成能力。
+    \item \textbf{BBH（子集）} \cite{suzgun2022challenging}：在 BIG-Bench Hard 中 3 个具有挑战性的任务（例如，因果判断、形式谬误、导航）上的平均准确率，使用 3-shot 设置，以评估复杂推理能力。
+    \item \textbf{Robustness-QA：} 旨在测试对对抗性释义（adversarial paraphrasing）和基于 TriviaQA 的分布外问题的鲁棒性，报告 F1 分数（3-shot）。
+\end{itemize}
+
+\subsection{结果}
+表 \ref{tab:results_voge} 显示，VoGE-LLM-8B 在所有评估基准测试中均显著优于两个基线。在挑战性的 BBH 子集（比 MoE-Switch-8B 高 5.1 分）和 Robustness-QA 基准测试（F1 分数高 6.3 分）上，性能提升最为显著。这些结果有力地表明，VoGE-LLM 中的集成内投票机制是其增强的复杂推理能力以及对对抗性输入变异和分布外问题鲁棒性提高的关键。
+
+\begin{table}[b]
+\centering
+\caption{基准测试结果。VoGE-LLM-8B 凭借其集成内投票机制，在复杂推理和鲁棒性方面显示出显著提升。}
+\label{tab:results_voge}
+\resizebox{\columnwidth}{!}{%
+\begin{tabular}{lccccc}
+\hline
+\textbf{模型} & \textbf{MMLU} & \textbf{GSM8K} & \textbf{HumanEval} & \textbf{BBH (avg)} & \textbf{Robust-QA} \\
+ & (5-shot) & (pass@1) & (pass@1) & (3-shot) & (F1, 3-shot) \\ \hline
+Dense-7B & 65.2 & 48.5 & 30.1 & 55.3 & 58.9 \\
+MoE-Switch-8B & 68.5 & 55.1 & 33.5 & 60.2 & 63.5 \\
+\textbf{VoGE-LLM-8B} & \textbf{70.3} & \textbf{57.9} & \textbf{35.2} & \textbf{65.3} & \textbf{69.8} \\ \hline
+\end{tabular}%
+}
+\end{table}
+
+即使在标准基准测试如 MMLU、GSM8K 和 HumanEval 上，VoGE-LLM-8B 也取得了稳定提升，表明在知识、数学技能和编码能力方面的全面增强。VoGE-LLM 的每个 token 计算成本仍可控，与激活类似数量 FFN 的其他稀疏 MoE 模型相当。一项消融研究（见附件）表明，如果集成内聚合只是简单地从一个随机选择的原子专家进行透传（即禁用投票效应），则其性能显著低于 VoGE-LLM-8B，在 BBH 和 Robustness-QA 上的表现几乎回落到 MoE-Switch-8B 的水平，这突显了投票机制的关键贡献。
+
+\section{讨论}
+VoGE-LLM-8B 的虚构结果有力地支持了我们的核心论断：集成一个明确的投票机制，用于门控网络引导下的原子专家集成，可以显著提升 LLM 的性能和鲁棒性。VoGE 架构独特地结合了 MoE 路由的定向专业化（targeted specialization）与集成方法在细粒度层面的错误校正能力。
+
+在复杂推理（BBH）和鲁棒性基准测试（Robustness-QA）上更为显著的性能飞跃，凸显了集成内投票的有效性。当面临歧义或具有挑战性的输入变异时，在预选的专门集成内聚合多个原子专家的“意见”，对于得出更准确、更可靠的结果至关重要，从而减轻了依赖单个稀疏激活专家犯下关键错误的风险。
+
+VoGE-LLM 的设计提供了灵活性。每个集成内原子专家的数量（$M_i$）直接影响集成效应的强度，而专家集成的数量（$N_g$）则允许不同程度的专业化。未来的工作可以探索除了简单 logits 平均之外的更复杂的集成内聚合机制，例如学习原子专家的权重或使用基于注意力的聚合。研究如何明确促进同一集成内原子专家之间的多样性，可以进一步增强集成的优势。此外，将 VoGE 概念应用于其他模态或模型架构是一个有前途的方向。每个激活集成的计算成本略有增加，也需要研究优化的实现方法。
+
+\section{结论}
+我们介绍了 VoGE-LLM，这是一种新型 LLM 架构，其独特之处在于采用分层结构，具有门控路由至专家集成，并且最重要的是，采用了用于输出聚合的集成内投票机制。我们对 VoGE-LLM-8B 的虚构评估表明，它在性能和鲁棒性方面，尤其是在复杂任务上，有可能超越标准的 MoE 和密集 LLMs。这种“基于门控专家集成的投票”范式为构建更强大、更高效、更可靠的大规模语言模型提供了一个有前途的方向。
+
+\begin{thebibliography}{99}
+\footnotesize
+\bibitem{chen2021evaluating}
+Chen, M., Tworek, J., Jun, H., Yuan, Q., Pinto, H.P.d.O., Kaplan, J., Edwards, H., Burda, Y., Joseph, N., Brockman, G. and Ray, A., 2021. Evaluating large language models trained on code. arXiv preprint arXiv:2107.03374.
+
+\bibitem{cobbe2021training}
+Cobbe, K., Kosaraju, V., Bavarian, M., Chen, M., Jun, H., Kaiser, L., Plappert, M., Tworek, J., Hilton, J., Nakano, R., Hesse, C. and Schulman, J., 2021. Training verifiers to solve math word problems. arXiv preprint arXiv:2110.14168.
+
+\bibitem{du2022glam}
+Du, N., Huang, Y., Dai, A.M., Welleck, S., Lepikhin, D., Lu, Y., Zhou, D., Zhai, A., Zhou, K., Zhang, Y. and Lai, M., 2022. Glam: Efficient scaling of language models with mixture-of-experts. In International Conference on Machine Learning (pp. 5547-5569). PMLR.
+
+\bibitem{fedus2022switch}
+Fedus, W., Zoph, B. and Shazeer, N., 2022. Switch transformers: Scaling to trillion parameter models with simple and efficient sparsity. Journal of Machine Learning Research, 23(120), pp.1-39.
+
+\bibitem{hendrycks2021measuring}
+Hendrycks, D., Burns, C., Basart, S., Critch, A., Li, J., Kossen, J., Steinhardt, J., Eloundou, T., Erhan, D., Agrawal, P. and Lin, T., 2021. Measuring massive multitask language understanding. In International Conference on Learning Representations.
+
+\bibitem{jacobs1991adaptive}
+Jacobs, R.A., Jordan, M.I., Nowlan, S.J. and Hinton, G.E., 1991. Adaptive mixtures of local experts. Neural computation, 3(1), pp.79-87.
+
+\bibitem{jordan1994hierarchical}
+Jordan, M.I. and Jacobs, R.A., 1994. Hierarchical mixtures of experts and the EM algorithm. Neural computation, 6(2), pp.181-214.
+
+\bibitem{shazeer2017outrageously}
+Shazeer, N., Mirhoseini, A., Maziarz, K., Davis, A., Le, Q., Hinton, G. and Dean, J., 2017. Outrageously large neural networks: The sparsely-gated mixture-of-experts layer. arXiv preprint arXiv:1701.06538.
+
+\bibitem{suzgun2022challenging}
+Suzgun, M., Scales, N., Schärli, N., Gehrmann, S., Tay, Y., Chung, H.W., Fedus, W., Dai, A.M., Chowdhery, A., Le, Q.V. and Chi, E.H., 2022. Challenging BIG-Bench tasks and whether large language models can solve them. arXiv preprint arXiv:2210.09308.
+
+\bibitem{zoph2022stable}
+Zoph, B., Fedus, W., Shazeer, N., Polosukhin, I.,ornia, Y., Roberts, A., Wang, P., Le, Q.V. and Dean, J., 2022. St-moe: Designing stable and transferable sparse expert models. arXiv preprint arXiv:2202.08906.
+
+\bibitem{moge2025}
+Fictional MoGE Author et al., 2025. Mixture of Group Experts for Learning Invariant Representations. arXiv preprint arXiv:25xx.xxxxx.
+
+\bibitem{hmora2025}
+Fictional HMoRA Author et al., 2025. HMoRA: Making LLMs More Effective with Hierarchical Mixture of LoRA Experts. arXiv preprint arXiv:25xx.xxxxx.
+
+\end{thebibliography}
+
+\end{document}
