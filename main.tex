@@ -75,7 +75,6 @@
   caption_after_label_space=0pt
 }
 \renewcommand{\jlreqparindent}{2\zw}
-\widowpenalty=10000
 
 \RenewBlockHeading{part}{-1}{
   number=true,
@@ -135,9 +134,9 @@
   after_label_space=0pt,
   align=left
 }%
-\input{supp-#1.tex}%
+{\widowpenalty=10000\input{supp-#1.tex}%
 \restoregeometry%
-\clearpage%
+\clearpage}%
 \restoresubsection%
 \restoresection%
 }
