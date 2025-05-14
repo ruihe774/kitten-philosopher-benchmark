@@ -1,10 +1,14 @@
-\documentclass[a5paper, 10pt, punct=kaiming, linespread=1.2, fontset=fandol]{ctexart}
+\documentclass[a5paper, 10pt, punct=kaiming, linespread=1.2, fontset=none]{ctexart}
 \usepackage[margin=1.5cm, foot=15pt, includefoot]{geometry}
 \usepackage{amsmath}
 \usepackage{graphicx}
 \usepackage{enumitem}
 \usepackage{tikz}
 \usetikzlibrary{positioning, shapes.geometric, arrows.meta, calc, fit}
+
+\defaultfontfeatures{Scale=1}
+\setCJKmainfont[Script=CJK, Language={Chinese Simplified}, BoldFont=SourceHanSerifSC-Bold.otf]{SourceHanSerifSC-Regular.otf}
+\setCJKsansfont[Script=CJK, Language={Chinese Simplified}, BoldFont=SourceHanSansSC-Bold.otf]{SourceHanSansSC-Regular.otf}
 
 \title{\Large VoGE-LLM：\\门控专家集成投票增强大语言模型鲁棒性与性能}
 \author{\normalsize 臭蛤蟆\textsuperscript{1}, 帽匠\textsuperscript{1}, 画匠\textsuperscript{1}, 老马\textsuperscript{1} \\
@@ -71,24 +75,24 @@ VoGE-LLM 架构基于标准的 Transformer 解码器框架。其核心创新在�
     \node[eg_block, below right=0.3cm and 1.6cm of gating] (eek) {专家集成 $k$ (Top-K)};
 
     \coordinate (ref_point_for_ee_other1) at ($ (gating.east)!0.5!(ee1.west) + (0,2.2cm) $);
-    \node[eg_block, right=0.5cm of ref_point_for_ee_other1, dashed, fill=gray!5] (ee_other1) {专家集成 (未激活)};
+    \node[eg_block, right=0.5cm of ref_point_for_ee_other1, dashed, fill=gray!5] (ee_other1) {专家集成 （未激活）};
 
     \coordinate (ref_point_for_ee_other2) at ($ (gating.east)!0.5!(eek.west) - (0,2.2cm) $);
-    \node[eg_block, right=0.5cm of ref_point_for_ee_other2, dashed, fill=gray!5] (ee_other2) {专家集成 (未激活)};
+    \node[eg_block, right=0.5cm of ref_point_for_ee_other2, dashed, fill=gray!5] (ee_other2) {专家集成 （未激活）};
 
     \node[atomic_expert, right=0.8cm of ee1] (ae11) {原子专家 \ttfamily 1.1};
     \node[atomic_expert, below=0.1cm of ae11] (ae1m) {原子专家 \ttfamily 1.M};
-    \node[below=0.05cm of ae11, yshift=0.15cm] (dots1) {\vdots};
+    \node[below=0.05cm of ae11, yshift=0.15cm] (dots1) {\phantom{\vdots}};
 
     \node[atomic_expert, right=0.8cm of eek] (aek1) {原子专家 \ttfamily k.1};
     \node[atomic_expert, below=0.1cm of aek1] (aekm) {原子专家 \ttfamily k.M};
-    \node[below=0.05cm of aek1, yshift=0.15cm] (dotsk) {\vdots};
+    \node[below=0.05cm of aek1, yshift=0.15cm] (dotsk) {\phantom{\vdots}};
 
     \node[vote_agg, right=0.7cm of ae1m, yshift=0.3cm] (vote1) {集成内投票};
     \node[vote_agg, right=0.7cm of aekm, yshift=0.3cm] (votek) {集成内投票};
 
     \coordinate (mid_votes_east_anchor) at ($(vote1.east)!0.5!(votek.east)$);
-    \node[block, right=0.6cm of mid_votes_east_anchor, text width=6em, minimum height=3em] (final_agg) {跨集成聚合 (加权求和)};
+    \node[block, right=0.6cm of mid_votes_east_anchor, text width=6em, minimum height=3em] (final_agg) {跨集成聚合 （加权求和）};
     \node[io, right=0.6cm of final_agg] (output) {输出 $h'_t$};
 
     \draw[connector] (input) -- (gating);
