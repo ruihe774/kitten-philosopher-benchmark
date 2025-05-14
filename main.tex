@@ -61,7 +61,6 @@
 \setsansjfont[YokoFeatures={JFM=zh_CN/quanjiao}, Script=CJK, Language={Chinese Simplified}, BoldFont=SourceHanSansSC-Bold.otf]{SourceHanSansSC-Regular.otf}
 \newjfontface{\kaiti}[YokoFeatures={JFM=zh_CN/quanjiao}, Script=CJK]{LXGWWenKai-Regular.ttf}
 \newfontface{\handwritten}{TeX Gyre Chorus}
-\newfontface{\dotfont}[Renderer=Basic]{Latin Modern Roman}
 \newfontface{\hanji}[Renderer=Basic, Script=CJK, Language={Chinese Simplified}]{SourceHanSerifSC-Regular.otf}
 \newcommand{\hantext}[1]{\text{\hanji#1}}
 
@@ -144,7 +143,7 @@
 }
 
 \newcommand{\htbox}[1]{\mbox{\sffamily#1}}
-\newcommand{\underdot}[1]{\ltjkenten[intergap=-1.3, fontcmd=\dotfont]{#1}}
+\newcommand{\underdot}[1]{\ltjkenten[intergap=-1.3, fontcmd=\fontfamily{lmr}]{#1}}
 
 \newcommand{\startpart}[2]{\loadgeometry{narrow}\part{#1}[#2]}
 \newcommand{\partquote}[2]{{\noindent\kaiti\small #1\par\hfill——#2}}
