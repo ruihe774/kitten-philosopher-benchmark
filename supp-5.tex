@@ -1,5 +1,7 @@
 \documentclass[a5paper, 10pt, punct=kaiming, linespread=1.2, fontset=none]{ctexart}
 \usepackage[margin=1.5cm, foot=15pt, includefoot]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
 \usepackage{amsmath}
 \usepackage{graphicx}
 \usepackage{enumitem}
@@ -183,7 +185,7 @@ VoGE-LLM-8B 的虚构结果有力地支持了我们的核心论断：集成一�
 VoGE-LLM 的设计提供了灵活性。每个集成内原子专家的数量（$M_i$）直接影响集成效应的强度，而专家集成的数量（$N_g$）则允许不同程度的专业化。未来的工作可以探索除了简单 logits 平均之外的更复杂的集成内聚合机制，例如学习原子专家的权重或使用基于注意力的聚合。研究如何明确促进同一集成内原子专家之间的多样性，可以进一步增强集成的优势。此外，将 VoGE 概念应用于其他模态或模型架构是一个有前途的方向。每个激活集成的计算成本略有增加，也需要研究优化的实现方法。
 
 \section{结论}
-我们介绍了 VoGE-LLM，这是一种新型 LLM 架构，其独特之处在于采用分层结构，具有门控路由至专家集成，并且最重要的是，采用了用于输出聚合的集成内投票机制。我们对 VoGE-LLM-8B 的虚构评估表明，它在性能和鲁棒性方面，尤其是在复杂任务上，有可能超越标准的 MoE 和密集 LLMs。这种“基于门控专家集成的投票”范式为构建更强大、更高效、更可靠的大规模语言模型提供了一个有前途的方向。
+我们研发了 VoGE-LLM，这是一种新型 LLM 架构，其独特之处在于采用分层结构，具有门控路由至专家集成，并且最重要的是，采用了用于输出聚合的集成内投票机制。我们对 VoGE-LLM-8B 的虚构评估表明，它在性能和鲁棒性方面，尤其是在复杂任务上，有可能超越标准的 MoE 和密集 LLMs。这种“基于门控专家集成的投票”范式为构建更强大、更高效、更可靠的大规模语言模型提供了一个有前途的方向。
 
 \begin{thebibliography}{99}
 \footnotesize
