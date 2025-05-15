@@ -9,6 +9,11 @@
           }
       }
   }
+
+\tl_new:N \l__my_texmf_dist_tl
+\__my_getenv:Nn \l__my_texmf_dist_tl { TEXMFDIST }
+\cs_new_eq:NN \texmfdist \l__my_texmf_dist_tl
+
 \tl_new:N \l__my_production_env_tl
 \__my_getenv:Nn \l__my_production_env_tl { PRODUCTION }
 
@@ -41,27 +46,27 @@
 \ExplSyntaxOff
 
 \newcommand{\Cjascale}{1}
-\usepackage{luatexja-fontspec}
+\usepackage[pass={no-config}]{luatexja-fontspec}
 \usepackage{luatexja-ruby}
 \usepackage{unicode-math}
 \usepackage[hidelinks, bookmarks, bookmarksopen, pdfpagelayout=TwoColumnRight]{hyperref}
 \usepackage[mode=math, per-mode=symbol]{siunitx}
 \usepackage{zhnumber}
 \usepackage{graphicx}
-\usepackage{seqsplit}
 \usepackage{pdfpages}
 
+\newcommand{\seqsplit}[1]{{\prehyphenchar=0 #1}}
 \DeclareSIUnit\angstrom{Å}
 
-\defaultfontfeatures{Scale=1, Ligatures=Common}
-\setmainfont{STIX Two Text}
-\setmathfont{STIX Two Math}
-\setsansfont{Source Sans Pro}
-\setmainjfont[YokoFeatures={JFM=zh_CN/kaiming}, Script=CJK, Language={Chinese Simplified}, BoldFont=SourceHanSerifSC-Bold.otf]{SourceHanSerifSC-Regular.otf}
-\setsansjfont[YokoFeatures={JFM=zh_CN/quanjiao}, Script=CJK, Language={Chinese Simplified}, BoldFont=SourceHanSansSC-Bold.otf]{SourceHanSansSC-Regular.otf}
-\newjfontface{\kaiti}[YokoFeatures={JFM=zh_CN/quanjiao}, Script=CJK]{LXGWWenKai-Regular.ttf}
-\newfontface{\handwritten}{TeX Gyre Chorus}
-\newfontface{\hanji}[Renderer=Basic, Script=CJK, Language={Chinese Simplified}]{SourceHanSerifSC-Regular.otf}
+\defaultfontfeatures{Scale=1}
+\setmainfont[Path={\texmfdist/fonts/opentype/public/stix2-otf/}, Extension=.otf, UprightFont=*-Regular, BoldFont=*-Bold, ItalicFont=*-Italic, BoldItalic=*-BoldItalic]{STIXTwoText}
+\setmathfont[Path={\texmfdist/fonts/opentype/public/stix2-otf/}, Extension=.otf]{STIXTwoMath-Regular}
+\setsansfont[Path={\texmfdist/fonts/opentype/adobe/sourcesanspro/}, Extension=.otf, UprightFont=*-Regular, BoldFont=*-Bold, ItalicFont=*-RegularIt, BoldItalic=*-BoldIt]{SourceSansPro}
+\setmainjfont[YokoFeatures={JFM=zh_CN/kaiming}, Script=CJK, Language={Chinese Simplified}, Extension=.otf, UprightFont=*-Regular, BoldFont=*-Bold]{SourceHanSerifSC}
+\setsansjfont[YokoFeatures={JFM=zh_CN/quanjiao}, Script=CJK, Language={Chinese Simplified}, Extension=.otf, UprightFont=*-Regular, BoldFont=*-Bold]{SourceHanSansSC}
+\newjfontface{\kaiti}[YokoFeatures={JFM=zh_CN/quanjiao}, Script=CJK, Extension=.ttf, UprightFont=*-Regular]{LXGWWenKai}
+\newfontface{\handwritten}[Path={\texmfdist/fonts/opentype/public/tex-gyre/}, Extension=.otf, UprightFont=*-mediumitalic]{texgyrechorus}
+\newfontface{\hanji}[Renderer=Basic, Script=CJK, Language={Chinese Simplified}, Extension=.otf, UprightFont=*-Regular]{SourceHanSerifSC}
 \newcommand{\hantext}[1]{\text{\hanji#1}}
 
 \ltjdefcharrange{6}{`⸺}
