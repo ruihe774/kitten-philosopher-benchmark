@@ -1,0 +1,38 @@
+name: CI
+on:
+  push:
+    branches-ignore:
+      - main
+  workflow_dispatch:
+    inputs:
+      production:
+        type: boolean
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    container:
+      image: texlive/texlive:TL2024-historic
+      env:
+        PRODUCTION: ${{ inputs.production == null && '' || ( inputs.production && '1' || '0' ) }}
+    steps:
+      - name: Cache VAR
+        uses: actions/cache@v4
+        with:
+          path: /usr/local/texlive/2024/texmf-var
+          key: TL2024-TEXMFVAR
+      - name: Install LFS
+        run: |
+          apt-get update
+          apt-get install -y git-lfs --no-install-recommends
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          lfs: true
+      - name: Build
+        run: ./compile.sh
+      - name: Upload
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ github.ref_name }}-${{ inputs.production && 'prod' || 'dev' }}
+          path: main.pdf
