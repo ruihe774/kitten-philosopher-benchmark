@@ -165,6 +165,14 @@
 \newcommand{\badend}{\myend{坏结局}}
 
 \title{延迟中的幽灵}
+\ExplSyntaxOn
+\bool_if:NTF \l__my_production_mode_bool
+  {
+    \author{林暮寒}
+    \date{2025~·~夏}
+  }
+  {}
+\ExplSyntaxOff
 
 \begin{document}
 \frontmatter\maketitle%
