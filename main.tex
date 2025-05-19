@@ -53,7 +53,9 @@
 \usepackage[mode=math, per-mode=symbol]{siunitx}
 \usepackage{zhnumber}
 \usepackage{graphicx}
-\usepackage{pdfpages}
+\usepackage{enumitem}
+\usepackage{tikz}
+\usetikzlibrary{positioning, shapes.geometric, arrows.meta, calc, fit}
 
 \newcommand{\seqsplit}[1]{{\prehyphenchar=0 #1}}
 \DeclareSIUnit\angstrom{Å}
@@ -63,6 +65,7 @@
 \setsansfont[Path={\texmfdist/fonts/opentype/adobe/sourcesanspro/}, Extension=.otf, UprightFont=*-Regular, BoldFont=*-Bold, ItalicFont=*-RegularIt, BoldItalicFont=*-BoldIt]{SourceSansPro}
 \setmainjfont[YokoFeatures={JFM=zh_CN/kaiming}, Script=CJK, Language={Chinese Simplified}, Extension=.otf, UprightFont=*-Regular, BoldFont=*-Bold]{SourceHanSerifSC}
 \setsansjfont[YokoFeatures={JFM=zh_CN/quanjiao}, Script=CJK, Language={Chinese Simplified}, Extension=.otf, UprightFont=*-Regular, BoldFont=*-Bold]{SourceHanSansSC}
+\newfontface{\kaieng}[Extension=.ttf, UprightFont=*-Regular]{LXGWWenKai}
 \newjfontface{\kaiti}[YokoFeatures={JFM=zh_CN/quanjiao}, Script=CJK, Extension=.ttf, UprightFont=*-Regular]{LXGWWenKai}
 \newfontface{\handwritten}[Path={\texmfdist/fonts/opentype/public/tex-gyre/}, Extension=.otf, UprightFont=*-mediumitalic]{texgyrechorus}
 \newfontface{\hanji}[Scale=\Cjascale, Renderer=Basic, Script=CJK, Language={Chinese Simplified}, Extension=.otf, UprightFont=*-Regular]{SourceHanSerifSC}
@@ -111,6 +114,11 @@
   after_label_space=0pt
 }
 
+\ModifyHeading{paragraph}{
+  font=\sffamily\bfseries,
+  indent=2\zw
+}
+
 \renewcommand{\contentsname}{我们的故事}
 \setcounter{tocdepth}{0}
 
@@ -145,6 +153,7 @@
 \restoresection%
 }
 
+\newcommand{\textkt}[1]{{\kaieng\kaiti#1}}
 \newcommand{\htbox}[1]{\mbox{\sffamily#1}}
 \newcommand{\fsbox}[1]{\htbox{#1}\fullspace}
 \newcommand{\clbox}[1]{\htbox{#1}\makebox[1\zw][l]{\sffamily：}}
