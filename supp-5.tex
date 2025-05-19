@@ -59,6 +59,8 @@ VoGE-LLM架构基于标准的Transformer解码器框架。其核心创新在于�
 来自\(K_g\)个被选定专家集成的聚合输出\(O_{\text{ensemble}_i}\)根据门控网络分配的权重\(w_i\)进行组合：
 \[h'_t = \sum_{k=1}^{K_g} w_{\text{selected}_k} \cdot O_{\text{selected}_k}\]
 
+\textkt{老马：公式太少了；再多写几个。}
+
 \paragraph{训练目标} 模型采用端到端的方式进行训练，总损失函数为\(L_\text{total} = L_\text{lm} + \alpha \cdot L_\text{aux}\)，其中\(L_\text{lm}\)是标准的交叉熵语言模型损失（cross-entropy language modeling loss），而\(L_\text{aux}\)是一个辅助负载均衡损失（auxiliary load balancing loss），用于鼓励门控网络将词元相对均匀地分配给专家集成。
 
 \begin{figure*}[t]
