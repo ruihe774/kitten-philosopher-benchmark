@@ -1,4 +1,2 @@
-#!/bin/sh -e
-
-#latexmk -xelatex -time supp-5.tex
+#!/bin/sh
 latexmk -pdflua -time main.tex
