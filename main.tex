@@ -1,3 +1,5 @@
+\documentclass[book, a5paper, 11pt]{jlreq}
+
 \ExplSyntaxOn
 \cs_new_protected:Npn \__my_getenv:Nn #1 #2
   {
@@ -25,23 +27,11 @@
 
 \bool_if:NTF \l__my_production_mode_bool
   {
-    \DocumentMetadata{lang=zh-CN}
-  }
-  {
-    \DocumentMetadata{lang=zh-CN, uncompress}
-    \directlua{dofile("wordstats.lua")}
-  }
-\ExplSyntaxOff
-
-\documentclass[book, a5paper, 11pt]{jlreq}
-
-\ExplSyntaxOn
-\bool_if:NTF \l__my_production_mode_bool
-  {
     \RequirePackage[pass]{geometry}
   }
   {
     \RequirePackage[pass, showframe]{geometry}
+    \directlua{dofile("wordstats.lua")}
   }
 \ExplSyntaxOff
 
@@ -49,7 +39,7 @@
 \usepackage[pass={no-config}]{luatexja-fontspec}
 \usepackage{luatexja-ruby}
 \usepackage{unicode-math}
-\usepackage[hidelinks, bookmarks, bookmarksopen, pdfpagelayout=TwoColumnRight]{hyperref}
+\usepackage[pdfusetitle, hidelinks, bookmarks, bookmarksopen, pdfpagelayout=TwoColumnRight]{hyperref}
 \usepackage[mode=math, per-mode=symbol]{siunitx}
 \usepackage{zhnumber}
 \usepackage{graphicx}
