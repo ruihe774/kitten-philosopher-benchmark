@@ -135,8 +135,17 @@
 
 \renewcommand{\contentsname}{我们的故事}
 \setcounter{tocdepth}{0}
-
 \makeatletter
+\def\jlreq@heading@maketoc@part#1#2#3{%
+  \jlreq@iffirsttoken{#1}{*}{}{%
+    \addcontentsline{toc}{part}{\texorpdfstring{\makebox[7\zw][l]{第\zhnum{part}部分}}{}#3}%
+  }{}%
+}
+\def\jlreq@heading@maketoc@chapter#1#2#3{%
+  \jlreq@iffirsttoken{#1}{*}{}{%
+    \addcontentsline{toc}{chapter}{\texorpdfstring{\makebox[7\zw][l]{第\zhnum{chapter}章}}{}#3}%
+  }{}%
+}
 \newcommand{\providegeometry}[2]{\@ifundefined{Gm@restore@@#1}{\newgeometry{#2}\savegeometry{#1}}{\loadgeometry{#1}}}
 \makeatother
 
