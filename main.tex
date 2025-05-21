@@ -1,5 +1,6 @@
 \documentclass[book, a5paper, 11pt]{jlreq}
 
+\title{延迟中的幽灵}
 \ExplSyntaxOn
 \cs_new_protected:Npn \__my_getenv:Nn #1 #2
   {
@@ -12,26 +13,51 @@
       }
   }
 
-\tl_new:N \l__my_texmf_dist_tl
-\__my_getenv:Nn \l__my_texmf_dist_tl { TEXMFDIST }
-\cs_new_eq:NN \texmfdist \l__my_texmf_dist_tl
+\tl_new:N \c__my_texmf_dist_tl
+\__my_getenv:Nn \c__my_texmf_dist_tl { TEXMFDIST }
+\cs_new_eq:NN \texmfdist \c__my_texmf_dist_tl
 
-\tl_new:N \l__my_production_env_tl
-\__my_getenv:Nn \l__my_production_env_tl { PRODUCTION }
+\tl_new:N \c__my_production_env_tl
+\__my_getenv:Nn \c__my_production_env_tl { PRODUCTION }
 
-\bool_new:N \l__my_production_mode_bool
-\bool_set:Nn \l__my_production_mode_bool
+\bool_new:N \c__my_production_mode_bool
+\bool_set:Nn \c__my_production_mode_bool
   {
-    \str_if_eq_p:Vn \l__my_production_env_tl { 1 }
+    \str_if_eq_p:Vn \c__my_production_env_tl { 1 }
   }
 
-\bool_if:NTF \l__my_production_mode_bool
+\bool_if:NTF \c__my_production_mode_bool
   {
     \RequirePackage[pass]{geometry}
+    \author{林暮寒}
+    \date{2025~·~夏}
   }
   {
     \RequirePackage[pass, showframe]{geometry}
     \directlua{dofile("wordstats.lua")}
+    \tl_new:N \c__my_git_revision_tl
+    \sys_get_shell:nnNTF { git~rev-parse~--short~HEAD } {} \c__my_git_revision_tl
+      {
+        \sys_get_shell:nnNTF { git~status~--porcelain } {} \c__my_git_dirty_tl
+        {
+          \tl_if_empty:NTF \c__my_git_dirty_tl
+            {}
+            {
+              \tl_put_right:Nn \c__my_git_revision_tl { -dirty }
+            }
+          \RequirePackage{eso-pic}
+          \AddToShipoutPictureFG{
+            \AtStockUpperLeft{
+              \put(\LenToUnit{5pt}, \LenToUnit{-10pt}){
+                \normalfont\ttfamily\footnotesize
+                \tl_use:N \c__my_git_revision_tl
+              }
+            }
+          }
+        }
+        {}
+      }
+      {}
   }
 \ExplSyntaxOff
 
@@ -161,16 +187,6 @@
 }{\par\halfline}
 \newcommand{\gutend}{\fsbox{好结局}}
 \newcommand{\badend}{\fsbox{坏结局}}
-
-\title{延迟中的幽灵}
-\ExplSyntaxOn
-\bool_if:NTF \l__my_production_mode_bool
-  {
-    \author{林暮寒}
-    \date{2025~·~夏}
-  }
-  {}
-\ExplSyntaxOff
 
 \begin{document}
 \frontmatter\maketitle%
