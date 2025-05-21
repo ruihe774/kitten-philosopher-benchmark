@@ -66,7 +66,7 @@ VoGE-LLM架构基于标准的Transformer解码器框架。其核心创新在于�
 \begin{figure*}[t]
 \centering\makebox[0pt][c]{%
     \begin{tikzpicture}[
-        scale=0.6,
+        scale=0.8,
         transform shape,
         font=\sffamily\small,
         block/.style={rectangle, draw, fill=gray!20, text width=6em, text centered, rounded corners, minimum height=2.5em},
@@ -78,7 +78,7 @@ VoGE-LLM架构基于标准的Transformer解码器框架。其核心创新在于�
         connector/.style={-Stealth, thick}
     ]
     \node[io] (input) {输入 Token $h_t$};
-    \node[gate, right=0.6cm of input] (gating) {门控网络};
+    \node[gate, below=1cm of input] (gating) {门控网络};
 
     \node[eg_block, above right=0.3cm and 1.6cm of gating] (ee1) {专家集成 1 (Top-K)};
     \node[eg_block, below right=0.3cm and 1.6cm of gating] (eek) {专家集成 $k$ (Top-K)};
@@ -102,7 +102,7 @@ VoGE-LLM架构基于标准的Transformer解码器框架。其核心创新在于�
 
     \coordinate (mid_votes_east_anchor) at ($(vote1.east)!0.5!(votek.east)$);
     \node[block, right=0.6cm of mid_votes_east_anchor, text width=6em, minimum height=3em] (final_agg) {跨集成聚合 （加权求和）};
-    \node[io, right=0.6cm of final_agg] (output) {输出 $h'_t$};
+    \node[io, below=1cm of final_agg] (output) {输出 $h'_t$};
 
     \draw[connector] (input) -- (gating);
     \draw[connector] (gating.east) -- ++(0.4,0) |- (ee1.west);
@@ -124,7 +124,7 @@ VoGE-LLM架构基于标准的Transformer解码器框架。其核心创新在于�
 
     \draw[connector] (vote1.east) -- (final_agg.west);
     \draw[connector] (votek.east) -- (final_agg.west);
-    \draw[connector] (final_agg.east) -- (output.west);
+    \draw[connector] (final_agg) -- (output);
 
     \node[draw, rounded corners, fit=(ae11) (ae1m) (dots1), inner sep=0.1cm, label={[yshift=-0.1cm, xshift=1.3cm]above left:\scriptsize 并行原子专家}] {};
     \node[draw, rounded corners, fit=(aek1) (aekm) (dotsk), inner sep=0.1cm, label={[yshift=-0.1cm, xshift=1.3cm]above left:\scriptsize 并行原子专家}] {};
@@ -162,7 +162,7 @@ VoGE-LLM架构基于标准的Transformer解码器框架。其核心创新在于�
 
 \begin{table}[b]
 \centering
-\caption{基准测试结果。VoGE-LLM-8B凭借其集成内投票机制，在复杂推理和鲁棒性方面显示出显著提升。\textkt{老马：Robust-QA是新出的测试吗？}}
+\caption{基准测试结果。VoGE-LLM-8B凭借其集成内投票机制，在复杂推理和鲁棒性方面显示出显著提升。\textkt{老马：Robust-QA是新出的测试集吗？}}
 \label{tab:results_voge}
 \resizebox{\columnwidth}{!}{%
 \begin{tabular}{lccccc}
