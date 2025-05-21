@@ -34,7 +34,7 @@
   }
   {
     \RequirePackage[pass, showframe]{geometry}
-    \directlua{dofile("wordstats.lua")}
+    \RequirePackage{eso-pic}
     \tl_new:N \c__my_git_revision_tl
     \sys_get_shell:nnNTF { git~rev-parse~--short~HEAD } {} \c__my_git_revision_tl
       {
@@ -45,7 +45,6 @@
             {
               \tl_put_right:Nn \c__my_git_revision_tl { -dirty }
             }
-          \RequirePackage{eso-pic}
           \AddToShipoutPictureFG{
             \AtStockUpperLeft{
               \put(\LenToUnit{5pt}, \LenToUnit{-10pt}){
@@ -58,6 +57,15 @@
         {}
       }
       {}
+    \AddToShipoutPictureFG{
+      \AtStockLowerLeft{
+        \put(\LenToUnit{5pt}, \LenToUnit{5pt}){
+          \normalfont\ttfamily\footnotesize
+          Draft
+        }
+      }
+    }
+    \directlua{dofile("wordstats.lua")}
   }
 \ExplSyntaxOff
 
