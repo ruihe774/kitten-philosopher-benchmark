@@ -2,25 +2,25 @@
 
 \begin{center}臭蛤蟆，帽匠，画匠，老马\end{center}
 
-\textkt{臭蛤蟆：先这样排序；反正现在流行全部作者都是共同第一作者。}
+{\kaiti 臭蛤蟆：先这样排序；反正现在流行全部作者都是共同第一作者。}
 
-\textkt{帽匠：之后问问画匠要挂哪个单位。}
+{\kaiti 帽匠：之后问问画匠要挂哪个单位。}
 
 \section*{摘要}
 \begingroup\small%
 混合专家（Mixture-of-Experts, MoE）大语言模型（Large Language Models, LLMs）展示了优越的可扩展性和计算效率。然而，每个词元（token）仅依赖少数稀疏激活（sparsely activated）的专家有时会导致脆弱性（brittleness）或次优的泛化（sub-optimal generalization）。我们提出VoGE-LLM（LLM with Voting over Gated Expert Ensembles）：这是一种新型架构，通过在分层专家结构（Hierarchical MoE）中整合一个基于投票的集成机制来增强模型整体的鲁棒性和表现。VoGE-LLM使用一个门控网络（gating network）将输入词元路由（route）到专门化的“专家集成（expert ensembles）”。每个专家集成由多个“原子专家（atomic experts）”组成，它们并行（parallel）处理输入。关键的是，它们的个体输出随后通过一个“软投票”（soft voting）机制（在我们主要实现中是logits平均）进行聚合，为该组生成一个鲁棒的、集成优化的输出。这种方法协同结合了门控网络的动态路由的优势与基于投票的集成的错误校正和泛化优势。基于这样的架构，我们训练了一个80亿参数的模型VoGE-LLM-8B，并通过基准测试表明，它显著优于可比的密集（dense）和标准的混合专家基线，特别是在复杂推理（reasoning）和分布外（out-of-distribution）任务上，突显了投票集成机制在专家集成上的有效性。
 \endgroup
 
-\textkt{老马：我认可了；看起来足够唬住人了。}
+{\kaiti 老马：我认可了；看起来足够唬住人了。}
 
 \section{引言}
-\textkt{帽匠：这部分让臭蛤蟆写；他喜欢考据现有文献和吹牛。}
+{\kaiti 帽匠：这部分让臭蛤蟆写；他喜欢考据现有文献和吹牛。}
 
-\textkt{臭蛤蟆：我列了一个大纲：先写LLM的文献综述，再写MoE的，再写分层MoE的，最后再补充一点voting的现有应用。}
+{\kaiti 臭蛤蟆：我列了一个大纲：先写LLM的文献综述，再写MoE的，再写分层MoE的，最后再补充一点voting的现有应用。}
 
-\textkt{老马：记得指出现有方法的缺陷和我们的创新。}
+{\kaiti 老马：记得指出现有方法的缺陷和我们的创新。}
 
-\textkt{臭蛤蟆：有的有的；创新点的部分我已经写好了。}
+{\kaiti 臭蛤蟆：有的有的；创新点的部分我已经写好了。}
 
 在本文中，我们提出了VoGE-LLM。我们的工作是在一个分层专家结构中，创新性地集成了基于投票的集成策略。VoGE-LLM的特点包括：
 \begin{itemize}[nosep]
@@ -30,7 +30,7 @@
 \end{itemize}
 这种分层投票方法旨在避免全激活的密集模型的效率劣势、利用稀疏的专家门控的效率优势，同时通过集成内的投票过程，回避稀疏激活机制的固有缺陷，进而显著提升鲁棒性和准确性。我们假设这种特别引入的投票步骤对于在需要复杂推理和强大泛化的任务上取得优越性能至关重要。
 
-\textkt{画匠：我们的玩意真有这么厉害吗？}
+{\kaiti 画匠：我们的玩意真有这么厉害吗？}
 
 \section{结果与方法}
 
@@ -46,20 +46,20 @@ VoGE-LLM架构基于标准的Transformer解码器框架。其核心创新在于�
 \paragraph{专家集成与原子专家}
 每个专家集成\(EE_i\)包含\(M_i\)个原子专家\(\{AE_{i,1}\), \ldots, \(AE_{i,M_i}\}\)。在VoGE-LLM-8B中，所有专家集成的\(M_i=4\)。每个原子专家是一个标准的Transformer前馈网络块（FFN block），具有独立的参数。当专家集成\(EE_i\)被激活时，输入表示\(h_t\)被传递给该集成内的所有\(M_i\)个原子专家。
 
-\textkt{帽匠：这些超参数当时是怎么确定的？审稿人问起来怎么办？}
+{\kaiti 帽匠：这些超参数当时是怎么确定的？审稿人问起来怎么办？}
 
 \paragraph{集成内的基于投票的聚合}
 这是VoGE-LLM的核心创新。来自激活的集成\(EE_i\)内的\(M_i\)个原子专家的输出\(O_{AE_{i,j}}\)被聚合成一个单一的、鲁棒的输出\(O_{\text{ensemble}_i}\)。对于VoGE-LLM-8B，我们将其实现为通过logits平均的“软投票”：
 \[O_{\text{ensemble}_i} = \frac{1}{M_i} \sum_{j=1}^{M_i} O_{AE_{i,j}}\]
 这种对专门化的集成内多个独立原子专家的logits进行平均，作为一种强大的机制，可以减少整个集成的输出的方差，并提高该词元的特定上下文（由门控决定）的表示的质量。
 
-\textkt{画匠：说实话我没太看懂这部分；这和激活函数后面再接几个隐藏层有什么区别吗？}
+{\kaiti 画匠：说实话我没太看懂这部分；这和激活函数后面再接几个隐藏层有什么区别吗？}
 
 \paragraph{跨集成聚合}
 来自\(K_g\)个被选定专家集成的聚合输出\(O_{\text{ensemble}_i}\)根据门控网络分配的权重\(w_i\)进行组合：
 \[h'_t = \sum_{k=1}^{K_g} w_{\text{selected}_k} \cdot O_{\text{selected}_k}\]
 
-\textkt{老马：公式太少了；再多写几个。}
+{\kaiti 老马：公式太少了；再多写几个。}
 
 \paragraph{训练目标} 模型采用端到端的方式进行训练，总损失函数为\(L_\text{total} = L_\text{lm} + \alpha \cdot L_\text{aux}\)，其中\(L_\text{lm}\)是标准的交叉熵语言模型损失（cross-entropy language modeling loss），而\(L_\text{aux}\)是一个辅助负载均衡损失（auxiliary load balancing loss），用于鼓励门控网络将词元相对均匀地分配给专家集成。
 
@@ -130,12 +130,12 @@ VoGE-LLM架构基于标准的Transformer解码器框架。其核心创新在于�
     \node[draw, rounded corners, fit=(aek1) (aekm) (dotsk), inner sep=0.1cm, label={[yshift=-0.1cm, xshift=1.3cm]above left:\scriptsize 并行原子专家}] {};
     \end{tikzpicture}
 }%
-\caption{VoGE-LLM层架构示意图。门控网络将输入的词元的表示\(h_t\)路由到Top-$K_g$个专家集成。在每个被选定的集成内（例如专家集成\(EE_1\)），\(M\)个原子专家并行处理\(h_t\)。它们的输出通过一个关键的集成内投票机制进行聚合。来自被选定集成的聚合输出随后合并以产生\(h'_t\)。\textkt{画匠：图我画好了；你们检查一下。}}%
+\caption{VoGE-LLM层架构示意图。门控网络将输入的词元的表示\(h_t\)路由到Top-$K_g$个专家集成。在每个被选定的集成内（例如专家集成\(EE_1\)），\(M\)个原子专家并行处理\(h_t\)。它们的输出通过一个关键的集成内投票机制进行聚合。来自被选定集成的聚合输出随后合并以产生\(h'_t\)。{\kaiti 画匠：图我画好了；你们检查一下。}}%
 \label{fig:voge_arch}%
 \end{figure*}
 
 \subsection{实验设置}
-\textkt{臭蛤蟆：帽匠你回去看一下代码；我快忘了当时我们是怎么弄的。}
+{\kaiti 臭蛤蟆：帽匠你回去看一下代码；我快忘了当时我们是怎么弄的。}
 
 \paragraph{基线}
 \begin{itemize}[nosep]
@@ -143,26 +143,26 @@ VoGE-LLM架构基于标准的Transformer解码器框架。其核心创新在于�
 \item\clbox{MoE-Switch-8B}一个类似于Switch Transformer的MoE模型，每个MoE层总共有128个专家（类似于VoGE的原子专家FFN），为每个词元激活Top-2的专家。这个模型的总参数量和每个词元的活跃参数量与VoGE-LLM-8B可比。
 \end{itemize}
 
-\textkt{画匠：为什么用这么老的模型。}
+{\kaiti 画匠：为什么用这么老的模型。}
 
 \paragraph{训练过程}
-\textkt{老马：你们当时到底是怎么训练的，把整个GPU集群都吃满了。}
+{\kaiti 老马：你们当时到底是怎么训练的，把整个GPU集群都吃满了。}
 
 \paragraph{评估基准测试}
 我们在以下基准测试（benchmarks）上评估了模型：
 
-\textkt{帽匠：介绍部分还是臭蛤蟆来写。}
+{\kaiti 帽匠：介绍部分还是臭蛤蟆来写。}
 
 \subsection{结果}
-表\ref{tab:results_voge}显示，VoGE-LLM-8B在所有评估基准测试中均显著优于两个基线。在挑战性的BBH子集（比MoE-Switch-8B高5.1分）和Robustness-QA基准测试（F1分数高6.3分）上，性能提升最为显著。这些结果有力地表明，VoGE-LLM中的集成内投票机制是其增强的复杂推理能力以及对对抗性输入变异和分布外问题鲁棒性提高的关键。即使在标准基准测试如MMLU、GSM8K和HumanEval上，VoGE-LLM-8B也取得了稳定提升，表明在知识、数学技能和编码能力方面的全面增强。VoGE-LLM的每个词元的计算成本仍可控，与激活类似数量FFN的其他稀疏MoE模型相当。一项消融研究（见附件。\textkt{帽匠：这个我来写吧。}）表明，如果集成内聚合只是简单地从一个随机选择的原子专家进行透传（即禁用投票机制），则其性能显著低于VoGE-LLM-8B，在BBH和Robustness-QA上的表现几乎回落到MoE-Switch-8B的水平，这突显了投票机制的关键贡献。
+表\ref{tab:results_voge}显示，VoGE-LLM-8B在所有评估基准测试中均显著优于两个基线。在挑战性的BBH子集（比MoE-Switch-8B高5.1分）和Robustness-QA基准测试（F1分数高6.3分）上，性能提升最为显著。这些结果有力地表明，VoGE-LLM中的集成内投票机制是其增强的复杂推理能力以及对对抗性输入变异和分布外问题鲁棒性提高的关键。即使在标准基准测试如MMLU、GSM8K和HumanEval上，VoGE-LLM-8B也取得了稳定提升，表明在知识、数学技能和编码能力方面的全面增强。VoGE-LLM的每个词元的计算成本仍可控，与激活类似数量FFN的其他稀疏MoE模型相当。一项消融研究（见附件。{\kaiti 帽匠：这个我来写吧。}）表明，如果集成内聚合只是简单地从一个随机选择的原子专家进行透传（即禁用投票机制），则其性能显著低于VoGE-LLM-8B，在BBH和Robustness-QA上的表现几乎回落到MoE-Switch-8B的水平，这突显了投票机制的关键贡献。
 
-\textkt{老马：这些指标是用了最好的结果还是平均的结果？}
+{\kaiti 老马：这些指标是用了最好的结果还是平均的结果？}
 
-\textkt{画匠：测这些有什么用吗？}
+{\kaiti 画匠：测这些有什么用吗？}
 
 \begin{table}[b]
 \centering
-\caption{基准测试结果。VoGE-LLM-8B凭借其集成内投票机制，在复杂推理和鲁棒性方面显示出显著提升。\textkt{老马：Robust-QA是新出的测试集吗？}}
+\caption{基准测试结果。VoGE-LLM-8B凭借其集成内投票机制，在复杂推理和鲁棒性方面显示出显著提升。{\kaiti 老马：Robust-QA是新出的测试集吗？}}
 \label{tab:results_voge}
 \resizebox{\columnwidth}{!}{%
 \begin{tabular}{lccccc}
@@ -184,10 +184,10 @@ VoGE-LLM-8B的结果有力地支持了我们的核心论断：集成一个明确
 VoGE-LLM的设计提供了灵活性。每个集成内原子专家的数量（\(M_i\)）直接影响集成效应的强度，而专家集成的数量（\(N_g\)）则允许不同程度的专业化。未来的工作可以探索除了简单logits平均之外的更复杂的集成内聚合机制，例如学习原子专家的权重或使用基于注意力的聚合，并研究如何促进同一集成内原子专家之间的多样性，从而进一步增强集成的优势。此外，将VoGE的概念应用于其他模态或模型架构是一个有前景的方向。每个激活集成的计算成本略有增加，也需要研究优化的实现方法。
 
 \section{结论}
-\textkt{臭蛤蟆：把之前的内容再总结一下。}
+{\kaiti 臭蛤蟆：把之前的内容再总结一下。}
 
-\textkt{帽匠：总算写完第一份草稿了。}
+{\kaiti 帽匠：总算写完第一份草稿了。}
 
-\textkt{老马：我去问问这写完后适合投递到哪里。}
+{\kaiti 老马：我去问问这写完后适合投递到哪里。}
 
-\textkt{画匠：有点不想署名。}
+{\kaiti 画匠：有点不想署名。}
