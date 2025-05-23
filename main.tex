@@ -201,6 +201,13 @@
 \newcommand{\halfline}{\vspace{0.5\baselineskip}}
 \newcommand{\fullspace}{\hspace{1\zw}}
 
+\newenvironment{song}{%
+  \begin{quote}%
+  \begingroup%
+  \spaceskip=0.5\zw%
+  \ignorespaces
+}{\endgroup\end{quote}}
+
 \newenvironment{branch}{%
   \par\halfline%
   \ignorespaces
