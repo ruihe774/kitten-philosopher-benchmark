@@ -20,6 +20,9 @@
 \tl_new:N \c__my_production_env_tl
 \__my_getenv:Nn \c__my_production_env_tl { PRODUCTION }
 
+\tl_new:N \c__my_include_only_tl
+\__my_getenv:Nn \c__my_include_only_tl { INCLUDEONLY }
+
 \bool_new:N \c__my_production_mode_bool
 \bool_set:Nn \c__my_production_mode_bool
   {
@@ -65,6 +68,11 @@
         }
       }
     }
+    \tl_if_empty:NTF \c__my_include_only_tl
+      {}
+      {
+        \includeonly{\c__my_include_only_tl}
+      }
     \directlua{dofile("wordstats.lua")}
   }
 \ExplSyntaxOff
@@ -221,7 +229,7 @@
 \frontmatter\maketitle%
 \newgeometry{left=3cm,right=3cm}\savegeometry{narrow}\tableofcontents\thispagestyle{empty}\restoregeometry%
 \mainmatter%
-\include{ghost.tex}\par
-\include{alice.tex}\par
-\include{god.tex}\par
+\include{ghost}\par
+\input{alice.tex}\par
+\input{god.tex}\par
 \end{document}
