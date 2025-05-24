@@ -1,3 +1,7 @@
+-- Chinese JFM for Simplified Chinese fonts (zh_CN)
+-- v1.0.1
+-- Copyright (c) 2020 -- 2021 ListLee.
+
 local is_vt, is_qj, is_bj, is_km, is_hwcl
 
 if luatexja.jfont.jfm_feature then
@@ -18,10 +22,7 @@ if
     not ((is_qj and not (is_bj or is_km)) or (is_bj and not (is_qj or is_km)) or
         (is_km and not (is_qj or is_bj)))
  then
-    tex.error(
-        'You must specify ONLY ONE feature among "quanjiao", "banjiao" and ' ..
-            '"kaiming"'
-    )
+    tex.error('You must specify ONLY ONE feature among "quanjiao", "banjiao" and "kaiming"')
 end
 
 local function aki(wd, pr, km)
