@@ -196,9 +196,9 @@
 \restoresection%
 }
 
-\newcommand{\htbox}[1]{\mbox{\sffamily#1}}
-\newcommand{\fsbox}[1]{\htbox{#1}\fullspace}
-\newcommand{\clbox}[1]{\htbox{#1}\makebox[1\zw][l]{\sffamily：}}
+\newcommand{\htbox}[1]{\mbox{\sffamily#1}\ignorespaces}
+\newcommand{\fsbox}[1]{\htbox{#1}\fullspace\ignorespaces}
+\newcommand{\clbox}[1]{\htbox{#1}\makebox[1\zw][l]{\sffamily：}\ignorespaces}
 \newcommand{\underdot}[1]{\ltjkenten[intergap=-1.3, fontcmd=\fontfamily{lmr}]{#1}}
 
 \newcommand{\startpart}[2]{\loadgeometry{narrow}\part{#1}[#2]}
