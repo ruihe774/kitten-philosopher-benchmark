@@ -138,7 +138,7 @@ VoGE-LLM架构基于标准的Transformer解码器框架。其核心创新在于�
 {\kaiti 臭蛤蟆：帽匠你回去看一下代码；我快忘了当时我们是怎么弄的。}
 
 \paragraph{基线}
-\begin{itemize}[nosep]
+\begin{itemize}[nosep, beginpenalty=1000]
 \item\clbox{Dense-7B} 一个参数量约为70亿的标准密集Transformer LLM，在相同数据上训练。
 \item\clbox{MoE-Switch-8B} 一个类似于Switch Transformer的MoE模型，每个MoE层总共有128个专家（类似于VoGE的原子专家FFN），为每个词元激活Top-2的专家。这个模型的总参数量和每个词元的活跃参数量与VoGE-LLM-8B可比。
 \end{itemize}
