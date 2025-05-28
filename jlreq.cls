@@ -469,11 +469,6 @@
   \else
     \RequirePackage[disablejfam]{luatexja}
   \fi
-  % Disable priority and let JFM decide
-  \RequirePackage{luatexja-adjust}
-  % \ltjenableadjust[lineend=extended,priority=true]
-  % \ltjsetparameter{stretch_priority={kanjiskip=0,xkanjiskip=10}}
-  % \ltjsetparameter{shrink_priority={kanjiskip=0,xkanjiskip=-30}}
 \else
   \RequirePackage{everyhook}
   \def\jlreq@jfmname@prefix{}
