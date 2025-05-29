@@ -744,10 +744,11 @@
 %.. (x)kanjiskip
 \ifjlreq@narrow@kanjiskip
   \providecommand*{\jlreqkanjiskip}{0pt~plus~.1\jlreq@zw ~minus~.01\jlreq@zw}
+  \providecommand*{\jlreqxkanjiskip}{0.25\jlreq@zw ~plus~0.125\jlreq@zw ~minus~0.125\jlreq@zw}
 \else
   \providecommand*{\jlreqkanjiskip}{0pt~plus~0.25\jlreq@zw ~minus~0pt}
+  \providecommand*{\jlreqxkanjiskip}{0.25\jlreq@zw ~plus~0.25\jlreq@zw ~minus~0.125\jlreq@zw}
 \fi
-\providecommand*{\jlreqxkanjiskip}{0.25\jlreq@zw ~plus~0.25\jlreq@zw ~minus~0.125\jlreq@zw}
 \jlreq@if{\ifx l\jlreq@engine\fi}{
   \AtBeginDocument{%
     \ltjsetparameter{kanjiskip=\jlreqkanjiskip}%
