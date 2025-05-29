@@ -13,10 +13,6 @@
       }
   }
 
-\tl_new:N \c__my_texmf_dist_tl
-\__my_getenv:Nn \c__my_texmf_dist_tl { TEXMFDIST }
-\cs_new_eq:NN \texmfdist \c__my_texmf_dist_tl
-
 \tl_new:N \c__my_production_env_tl
 \__my_getenv:Nn \c__my_production_env_tl { PRODUCTION }
 
@@ -94,14 +90,14 @@
 \DeclareSIUnit\angstrom{Å}
 
 \makeatletter
-\setmainfont[Path={\texmfdist/fonts/opentype/public/stix2-otf/}, Extension=.otf, UprightFont=*-Regular, BoldFont=*-Bold, ItalicFont=*-Italic, BoldItalicFont=*-BoldItalic]{STIXTwoText}
-\setmathfont[Path={\texmfdist/fonts/opentype/public/stix2-otf/}, Extension=.otf]{STIXTwoMath-Regular}
-\setsansfont[Path={\texmfdist/fonts/opentype/adobe/sourcesanspro/}, Extension=.otf, UprightFont=*-Regular, BoldFont=*-Bold, ItalicFont=*-RegularIt, BoldItalicFont=*-BoldIt]{SourceSansPro}
+\setmainfont[KpseOnly]{STIX Two Text}
+\setmathfont[KpseOnly]{STIX Two Math}
+\setsansfont[KpseOnly]{Source Sans Pro}
 \setmainjfont[YokoFeatures={JFM=zh_CN/kaiming}, Script=CJK, Language={Chinese Simplified}, Extension=.otf, UprightFont=*-Regular, BoldFont=*-Bold]{SourceHanSerifSC}
 \setsansjfont[YokoFeatures={JFM=zh_CN/quanjiao}, Script=CJK, Language={Chinese Simplified}, Extension=.otf, UprightFont=*-Regular, BoldFont=*-Bold]{SourceHanSansSC}
+\newfontface{\stylish}[KpseOnly]{TeX Gyre Chorus}
 \newfontface{\kaiti@en}[Extension=.ttf, UprightFont=*-Regular]{LXGWWenKai}
 \newjfontface{\kaiti@cn}[YokoFeatures={JFM=zh_CN/quanjiao}, Script=CJK, Extension=.ttf, UprightFont=*-Regular]{LXGWWenKai}
-\newfontface{\handwritten}[Path={\texmfdist/fonts/opentype/public/tex-gyre/}, Extension=.otf, UprightFont=*-mediumitalic]{texgyrechorus}
 \newjfontface{\pencil}[YokoFeatures={JFM=zh_CN/quanjiao}, Extension=.ttf, UprightFont=*-Regular]{XiaolaiSC}
 \newcommand{\kaiti}{\kaiti@en\kaiti@cn}
 \newcommand{\hantext}[1]{#1}
@@ -123,7 +119,7 @@
   format={{\noindent#1\\#2\\\vspace{-5pt}#3}},
   subtitle_format={#1},
   font=\Large\rmfamily,
-  subtitle_font=\footnotesize\handwritten,
+  subtitle_font=\footnotesize\stylish,
   align=center,
   after_label_space=0pt,
   lines=15,
