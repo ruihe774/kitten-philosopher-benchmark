@@ -86,9 +86,8 @@
 \usepackage{zhnumber}
 \usepackage{graphicx}
 \usepackage{enumitem}
-\usepackage{ulem}
 \usepackage{tikz}
-\usetikzlibrary{positioning, shapes.geometric, arrows.meta, calc, fit}
+\usetikzlibrary{positioning, shapes.geometric, arrows.meta, calc, fit, decorations.pathmorphing}
 
 \newcommand{\seqsplit}[1]{{\prehyphenchar=0 #1}}
 \DeclareSIUnit\angstrom{Å}
@@ -225,6 +224,19 @@
 \newcommand{\badend}{\fsbox{坏结局}}
 
 \newcommand{\fullpercent}{\qty{100}{\percent}}
+
+\newcounter{handsoutrandomseed}
+\newcommand{\handsout}[2][line width=1pt]{%
+  \stepcounter{handsoutrandomseed}%
+  \tikz[baseline=(todraw.base)]{
+    \node[inner sep=0pt, outer sep=0pt] (todraw) {#2};
+    \coordinate (start) at (todraw.west);
+    \coordinate (end) at (todraw.east);
+    \pgfmathsetseed{\value{handsoutrandomseed}}
+    \draw[#1, decoration={random steps, amplitude=0.2mm, segment length=2mm}, decorate]
+    (start) -- (end);
+  }%
+}
 
 \begin{document}
 \frontmatter\maketitle%
