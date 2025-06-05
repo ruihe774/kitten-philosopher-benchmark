@@ -818,7 +818,7 @@
 \fi
 \jlreq@divide{\jlreq@jafontsize}{\jlreq@fontsize}
 \edef\jlreq@jafontscale{\strip@pt\jlreq@resultdimen}
-\__jlreq_aftercls_addtodeletecs:N \jlreq@jafontscale
+%\__jlreq_aftercls_addtodeletecs:N \jlreq@jafontscale
 \ifx l\jlreq@engine
   \DeclareFontShape{JY3}{mc}{m}{n}{<->s*[\jlreq@jafontscale]\ltj@stdmcfont :jfm=jlreq;-kern}{}
   \DeclareFontShape{JY3}{gt}{m}{n}{<->s*[\jlreq@jafontscale]\ltj@stdgtfont :jfm=jlreq;-kern}{}
