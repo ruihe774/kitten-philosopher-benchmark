@@ -31,11 +31,13 @@
 
 \bool_if:NTF \c__my_production_mode_bool
   {
+    \cs_new_eq:NN \import \input
     \RequirePackage[pass]{geometry}
     \author{林暮寒}
     \date{2025~\raisebox{1pt}{·}~夏}
   }
   {
+    \cs_new_eq:NN \import \include
     \RequirePackage[pass, showframe]{geometry}
     \RequirePackage{eso-pic}
     \tl_new:N \c__my_git_revision_tl
@@ -71,7 +73,7 @@
     \tl_if_empty:NTF \c__my_include_only_tl
       {}
       {
-        \includeonly{\c__my_include_only_tl}
+        \importonly{\c__my_include_only_tl}
       }
     \directlua{dofile("wordstats.lua")}
   }
@@ -242,8 +244,8 @@
 \frontmatter\maketitle%
 \newgeometry{left=3cm,right=3cm}\savegeometry{narrow}\tableofcontents\thispagestyle{empty}\restoregeometry%
 \mainmatter%
-\include{ghost}\par
+\import{ghost}\par
 \input{alice.tex}\par
 \input{god.tex}\par
-\include{final}\par
+\import{final}\par
 \end{document}
