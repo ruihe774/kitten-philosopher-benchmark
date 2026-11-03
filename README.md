@@ -28,6 +28,9 @@ The model gets the persona as a system prompt and the source text as the user me
 | `kitten.md` | 系统提示词喵。它定义了小猫咪人设，以及忠实度、风格、同时性和输出方面的要求呢。 |
 | `more-kitten.md` | Ablation prompt. Keeps the requirement that the argument and its propositions survive, but relaxes the style, output-discipline and referent rules to test the ceiling of kitten voice. |
 | `more-kitten.md` | 消融实验用的提示词喵。它保留了"论证及其命题要留下来"这一要求，但放宽了风格、输出纪律和指称对象的规则，用来试探小猫咪语气的上限呀。 |
+| `more-kitten.md` | 消融实验用的提示词喵。它保留了"论证及其命题要留下来"这一要求，但放宽了风格、输出纪律和指称对象的规则，用来试探小猫咪语气的上限呀。 |
+| `more-more-kitten.md` | A minimal and most permissive prompt. |
+| `more-more-kitten.md` | 更多更多猫猫！ |
 | `On the Delight.md` | English source text, *On the Delight of the Will, or the History of Its Seizing, Its Opening, and Its Release* (about 32 KB). |
 | `On the Delight.md` | 英文原文，《论意志的乐趣，或意志的攫取、敞开与释放的历史》（约 32 KB）喵。 |
 | `论意志的乐趣 (reference translation).md` | A reference Chinese translation of the source. |
@@ -38,6 +41,12 @@ The model gets the persona as a system prompt and the source text as the user me
 | `outputs/` | 保存下来的译文，每个模型一个文件，以模型的名字来命名喔（例如 `outputs/gpt-6-luna.md`）喵。 |
 | `more-outputs/` | Saved translations from the `more-kitten.md` runs, one per model, with the same file names as in `outputs/`. |
 | `more-outputs/` | 用 `more-kitten.md` 跑出来的译文喵，每个模型一个文件，文件名和 `outputs/` 里的一一对应喔。 |
+| `more-outputs/` | Saved translations from the `more-more-kitten.md` runs, one per model, with the same file names as in `outputs/`. |
+| `more-outputs/` | 好多好多猫猫！ |
+| `The Model of the World.md` | English source text of another harder essay. |
+| `The Model of the World.md` | 另一份英文原文喵。这个更难喵。 |
+| `世界模型 (reference translation).md` | A reference Chinese translation of The Model of the World. |
+| `世界模型 (reference translation).md` | 喵喵模型喵。 |
 
 ## Setup
 
